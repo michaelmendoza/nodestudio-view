@@ -1,0 +1,18 @@
+@import '../../styles/base/variables.scss';
+
+.sideview {
+    position: absolute;
+    height: 100%;
+    width: 20em;
+    padding: 0;
+
+    color: #FEFEFE;
+    background-color: darken($app-background-color, 2%);
+    border-right: 1px solid #66666666;
+
+        label {
+        font-weight: 300;
+        margin: 1em;
+    }
+    
+}

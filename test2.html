@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.21.1/full/pyodide.js"></script>
+    <script type="text/javascript">
+        async function main() {
+            const pyodideRuntime = await loadPyodide();
+            await pyodideRuntime.loadPackage("numpy");
+            pyodideRuntime.runPython(`
+                name = "Jeff" # A Python variable
+
+                # Define a Python function
+                def multiplyTwoNumbers(x, y):
+                    return (x * y)
+
+                def createData():
+                    import numpy as np
+                    x = np.ones((2,2))
+                    x = np.uint16(x)
+                    return x
+
+                def base64encode(data):
+                    import base64
+                    encodedData = base64.b64encode(data)
+                    return encodedData
+
+                def createEncodedData():
+                    x = createData()
+                    return base64encode(x)
+            `); 
+
+            // Access and call it in JavaScript
+            let mult = pyodideRuntime.globals.get('multiplyTwoNumbers');
+            console.log("Multiplying 2 and 3 in Python: " + mult(2,3));
+            console.log("You're welcome, " + pyodideRuntime.globals.get('name'))
+
+            var test = pyodideRuntime.globals.get('createData');
+            var value = test().toJs()
+            console.log("Test: " + value)
+
+            var test2 = pyodideRuntime.globals.get('createEncodedData');
+            var value2 = test2().toString()
+            //var pixelArray = base64ToPixelArray(value2, dtype = 'uint16')
+            //console.log("Test" + pixelArray)
+        }
+        main()
+    </script>
+  </body>
+</html>

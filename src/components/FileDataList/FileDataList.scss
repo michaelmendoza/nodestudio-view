@@ -1,0 +1,23 @@
+
+.filedatalist {
+    
+    .filedata-item {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        padding: 0.5em 1em;
+        cursor: pointer;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        
+        &:hover {
+            background-color: #555555;
+        }
+    
+        label {
+            margin: 0 0 0 1em;
+            cursor: pointer;
+        }
+    }
+}

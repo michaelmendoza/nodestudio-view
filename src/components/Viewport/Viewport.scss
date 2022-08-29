@@ -1,0 +1,8 @@
+@import '../../styles/base/variables.scss';
+
+.viewport {
+    margin-left: 20em;
+
+    color: #FEFEFE;
+    background-color: darken($app-background-color, 2%);
+}

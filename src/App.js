@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import 'normalize.css';
+import './styles/app.scss';
+import './App.scss';
+import AppState from './state/AppState';
+import Viewport from './components/Viewport/Viewport';
+import SideView from './components/SideView.jsx/SideView';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+    return (
+        <div className="app">
+            <AppState.AppStateProvider>
+                <AppComponents></AppComponents>
+            </AppState.AppStateProvider>
+        </div>
+    );
+}
+
+const AppComponents = () => {
+    return (
+        <div>
+            <header className="header"> 
+                <div> NodeStudio Viewer</div>
+            </header>
+            <div>
+                <SideView></SideView>
+                <Viewport></Viewport>
+            </div>
+        </div>
+    );
 }
 
 export default App;
