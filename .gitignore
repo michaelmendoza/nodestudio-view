@@ -2,6 +2,7 @@
 
 # application specific 
 /data
+package_lock.json 
 
 # dependencies
 /node_modules
