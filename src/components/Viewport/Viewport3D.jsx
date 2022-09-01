@@ -70,7 +70,7 @@ const Viewport3D = ({dataset, drawUpdate}) => {
         mesh = new THREE.Mesh( geometry, material );
         mesh.position.set(0, 0, 0);
         scene.add( mesh );
-        
+
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setSize( ref.current.offsetWidth, ref.current.offsetHeight );
         ref.current.appendChild( renderer.domElement );

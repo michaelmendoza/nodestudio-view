@@ -17,7 +17,7 @@ const ViewportControls = ({ indices, setIndices, maxIndices, onUpdate }) => {
 
     return (<div className='viewport-controls'>
         {
-            keys.map((key) => <div className='viewport-control-item  layout-row-center'> 
+            keys.map((key) => <div key={key} className='viewport-control-item  layout-row-center'> 
                 <div className='label'> {key} </div> 
                 <Slider value={indices[key]} onChange={(value) => handleIndexUpdate(key, value)} max={maxIndices[key]}></Slider> 
             </div>)

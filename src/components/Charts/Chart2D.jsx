@@ -11,13 +11,14 @@ const Chart2D = ({ dataset }) => {
     const ref = useRef();
     const controls = useRef();
     const viewport = useRef({ isInit: false });
+    const frustumSize = 100;
 
     useEffect(()=>{
         if(viewport.current.isInit) return;
 
         init();
         animate();
-        //renderTexture();
+        window.addEventListener('resize', () => debounce(handleResize, 100, 'Chart2D-resize'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     
@@ -99,13 +100,10 @@ const Chart2D = ({ dataset }) => {
         var width = ref.current.clientWidth;
         var height = ref.current.clientHeight;
         var aspect = width / height;
-        const frustumSize = 100;
 
         camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 )
         camera.position.z = 10;
-
-        //camera = new THREE.PerspectiveCamera( 70, width / height, 0.01, 1000 );     
-        //camera.position.z = 50;
+        viewport.current.camera = camera;
 
         scene = new THREE.Scene();
         viewport.current.scene = scene;
@@ -113,10 +111,19 @@ const Chart2D = ({ dataset }) => {
         geometry = new THREE.BoxGeometry( 1, 1, 1 );
         material = new THREE.MeshNormalMaterial();
         mesh = new THREE.Mesh( geometry, material );
+        viewport.current.mesh = mesh;
         mesh.position.set(0, 0, 0);
         scene.add( mesh );
         
+        const size = 100;
+        const divisions = 16;
+        const gridHelper = new THREE.GridHelper( size, divisions );
+        gridHelper.rotation.x = Math.PI / 2;
+        gridHelper.position.z = 1;
+        scene.add( gridHelper );
+
         renderer = new THREE.WebGLRenderer( { antialias: true } );
+        viewport.current.renderer = renderer;
         renderer.setSize( ref.current.offsetWidth, ref.current.offsetHeight );
         ref.current.appendChild( renderer.domElement );
 
@@ -135,6 +142,25 @@ const Chart2D = ({ dataset }) => {
         requestAnimationFrame( animate );
         if(controls.current) controls.current.update();
         renderer.render( scene, camera );
+    }
+
+
+    const handleResize = () => {
+        var width = ref.current.clientWidth;
+        var height = ref.current.clientHeight;
+        var aspect = width / height;
+        console.log(`Resized to: ${width}, ${height}, ${aspect}`);
+
+        // Update aspect ratio
+        const camera = viewport.current.camera;
+        camera.left = frustumSize * aspect / - 2;
+        camera.right = frustumSize * aspect / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = frustumSize / - 2;
+        camera.updateProjectionMatrix();
+
+        // Update renderer
+        renderer.setSize( width, height );
     }
 
     return (<div className='chart-2d'>

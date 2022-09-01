@@ -12,6 +12,8 @@ export const throttle = (f, throttleTime = 100, id = '0') => {
 
 /** Debouce function */
 export const debounce = (f, debounceTime = 100, id = '0') => {
+    if (!refs[id]) f();
+
     clearTimeout(refs[id]);
     refs[id] = setTimeout(() => {
         f();
