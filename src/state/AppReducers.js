@@ -4,7 +4,8 @@ const count = () => counter++;
 export const ActionTypes = {
     'SET_FILES': count(),
     'SET_ACTIVE_FILE': count(),
-    'SET_ACTIVE_METADATA': count()
+    'SET_ACTIVE_METADATA': count(),
+    'SET_VIEW_MODE': count()
 }
 
 export const AppReducers = (state, action) => {
@@ -22,6 +23,10 @@ export const AppReducers = (state, action) => {
         // Active Metadata 
         case ActionTypes.SET_ACTIVE_METADATA:
             return { ...state, activeMetadata: action.payload }
+
+        // View Mode
+        case ActionTypes.SET_VIEW_MODE:
+            return { ...state, viewMode: action.payload }
 
         default:
             return state;

@@ -7,6 +7,7 @@ import { decodeDataset, scaleDataset } from '../../libraries/Data';
 import { generateDefaultIndices, generateKeyFromIndices } from '../../libraries/ArrayIndexer';
 import ViewportControls from './ViewportControls';
 import Chart2D from '../Charts/Chart2D';
+import Lightbox from '../Charts/Lightbox';
 
 const Viewport = () => {
 
@@ -59,10 +60,19 @@ const Viewport = () => {
     
     return (
         <div className='viewport'> 
-            <Chart2D dataset={dataset}></Chart2D>
+            <ChartsViewport dataset={dataset}></ChartsViewport>
             <ViewportControls indices={indices} setIndices={setIndices} maxIndices={maxIndices} onUpdate={handleIndexUpdate}></ViewportControls>
         </div>
     )
+}
+
+const ChartsViewport = ({ dataset }) => {
+    const { state } = useAppState();
+    const viewMode = state.viewMode;
+    return (<div>
+        { viewMode === '2D View' ? <Chart2D dataset={dataset}></Chart2D> : null }
+        { viewMode === 'Lightbox' ? <Lightbox dataset={dataset}></Lightbox> : null }
+    </div>)
 }
 
 export default Viewport;

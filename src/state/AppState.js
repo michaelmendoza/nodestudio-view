@@ -7,7 +7,8 @@ import { AppReducers } from './AppReducers';
 const initialState  = { 
     files: [],
     activeFile: null,
-    activeMetadata: null
+    activeMetadata: null,
+    viewMode: '2D View'
 };
 
 /**

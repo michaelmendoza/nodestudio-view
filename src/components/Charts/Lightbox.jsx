@@ -2,9 +2,21 @@ import * as THREE from 'three';
 import ChartBase from './ChartBase';
 import { Chart2D_FragmentShader, Chart2D_VertexShader } from './ChartShaders';
 
-const Chart2D = ({dataset}) => {
+const Lightbox = ({dataset}) => {
 
     const renderDataset = async (dataset, viewport) => {
+
+        const length = 4;
+        const width = 100 / 2;
+        const height = 100 / 2;
+
+        for(var i = 0; i < length; i++) {
+            const offset = { x: width * (i % 2) - width / 2, y: height * Math.floor(i / 2) - height / 2 }
+            renderDataslice(dataset, viewport, offset);
+        }
+    }
+
+    const renderDataslice = async (dataset, viewport, offset) => {
         console.log('renderUpdate')
 
         const data = dataset.data;
@@ -14,8 +26,8 @@ const Chart2D = ({dataset}) => {
         const VertexShader = Chart2D_VertexShader;
         const FragmentShader = Chart2D_FragmentShader;
 
-        const planeWidth = 100
-        const planeHeight = 100;
+        const planeWidth = 50
+        const planeHeight = 50;
 
         const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2] );
         texture.format = THREE.RedFormat;
@@ -35,6 +47,8 @@ const Chart2D = ({dataset}) => {
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
         const mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x = offset.x;
+        mesh.position.y = offset.y;
 
         viewport.current.scene.add( mesh );
         viewport.current.mesh = mesh;
@@ -43,4 +57,4 @@ const Chart2D = ({dataset}) => {
     return (<ChartBase dataset={dataset} renderDataset={renderDataset}></ChartBase>)
 }
 
-export default Chart2D;
+export default Lightbox;

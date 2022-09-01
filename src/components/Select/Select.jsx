@@ -19,10 +19,10 @@ const Select = ({options, value=undefined, onChange, placeholder='Select ...', c
 
     return (
         <div className={'select ' + className }>
-            <button className={'select-button ' + (show ? 'show':'')} onClick={handleClick} onBlur={onBlur}> { _value ? _value.label : placeholder } </button>
+            <button className={'select-button ' + (show ? 'show':'')} onClick={handleClick} onBlur={onBlur}> { _value ? _value : placeholder } </button>
             {
                 show ? <div className='layout-column select-options'>
-                    { options.map((option)=><button className='select-option' key={option.label} onClick={(e)=>handleOptionSelect(option)}>{option.label}</button>)}
+                    { options.map((option)=><button className='select-option' key={option.label} onClick={(e)=>handleOptionSelect(option)}>{option}</button>)}
                 </div> : null
             }
         </div>
