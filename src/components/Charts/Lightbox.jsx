@@ -12,7 +12,11 @@ const Lightbox = ({dataset}) => {
 
         for(var i = 0; i < length; i++) {
             const offset = { x: width * (i % 2) - width / 2, y: height * Math.floor(i / 2) - height / 2 }
-            renderDataslice(dataset, viewport, offset);
+
+            const _dataset = { data:dataset.data, shape:dataset.shape };
+            const _length = dataset.shape[1] * dataset.shape[2];
+            _dataset.data = _dataset.data.slice( _length * i, _length * (i+1)); 
+            renderDataslice(_dataset, viewport, offset);
         }
     }
 

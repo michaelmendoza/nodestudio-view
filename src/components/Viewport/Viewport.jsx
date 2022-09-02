@@ -39,7 +39,13 @@ const Viewport = () => {
 
     const fetchData = async (_metadata) => {
         if (!state.activeFile) return;
-        const key = generateKeyFromIndices(_metadata.shape, _metadata.indices);
+
+        let key;
+        if (state.viewMode === 'Lightbox')
+            key = generateKeyFromIndices(_metadata.shape, _metadata.indices, [1,2,3]);
+        else
+            key = generateKeyFromIndices(_metadata.shape, _metadata.indices);
+        
         let data = await APIDataService.getFileData(state.activeFile.id, key);
         if (data.isEncoded) {
             data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
