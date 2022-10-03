@@ -6,7 +6,6 @@ import FileDataInfo from '../FileDataInfo/FileDataInfo';
 
 const SideView = () => {
     return ( <div className="sideview">
-        <div></div>
         <Tabs tabnames={['Load', 'Files', 'Inspect']}>
                 <FileBrowser></FileBrowser>
                 <FileDataList></FileDataList>

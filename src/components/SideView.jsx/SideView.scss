@@ -2,12 +2,13 @@
 
 .sideview {
     position: absolute;
+    min-height: calc(100vh - 44px);
     height: 100%;
     width: 20em;
     padding: 0;
 
     color: #FEFEFE;
-    background-color: darken($app-background-color, 2%);
+    background-color: #24272e;
     border-right: 1px solid #66666666;
 
         label {

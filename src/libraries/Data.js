@@ -2,7 +2,7 @@
 export const scaleDataset = ({ data, shape, min, max }) => {
     // Fix min/max scaling 
     const resolution = 255;
-    const length = shape[0] * shape[1];
+    const length = shape.reduce((a,b) => a * b); //shape[0] * shape[1];
     const uint8Array = new Uint8Array(length);
     for (var i = 0; i < length; i++) {
         const value = data[i];

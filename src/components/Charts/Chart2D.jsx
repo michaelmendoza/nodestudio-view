@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import ChartBase from './ChartBase';
 import { Chart2D_FragmentShader, Chart2D_VertexShader } from './ChartShaders';
 
-const Chart2D = ({dataset}) => {
+const Chart2D = ({dataset, update}) => {
 
     const renderDataset = async (dataset, viewport) => {
         console.log('renderUpdate')
 
-        const data = dataset.data;
-        const shape = dataset.shape
+        const data = dataset.dataset.data;
+        const shape = dataset.dataset.shape;
         if(shape[2] === undefined) shape[2] = 1;
 
         const VertexShader = Chart2D_VertexShader;
@@ -40,7 +40,10 @@ const Chart2D = ({dataset}) => {
         viewport.current.mesh = mesh;
     }
 
-    return (<ChartBase dataset={dataset} renderDataset={renderDataset}></ChartBase>)
+    return (<div>
+        <div> {update} </div>
+        <ChartBase dataset={dataset} update={update} renderDataset={renderDataset}></ChartBase>
+    </div>)
 }
 
 export default Chart2D;

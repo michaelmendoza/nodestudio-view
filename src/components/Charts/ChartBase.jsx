@@ -3,11 +3,16 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls" 
 import { debounce } from '../../libraries/Utils';
+import { ActionTypes, useAppState } from '../../state';
+import ChartControls from './ChartControls';
 
+const raycaster = new THREE.Raycaster();
 var camera, scene, renderer;
 var geometry, material, mesh;
   
-const ChartBase = ({ dataset, renderDataset }) => {
+const ChartBase = () => {
+    const { dispatch } = useAppState();
+
     const ref = useRef();
     const controls = useRef();
     const viewport = useRef({ isInit: false });
@@ -18,14 +23,18 @@ const ChartBase = ({ dataset, renderDataset }) => {
 
         init();
         animate();
+
+        window.addEventListener('pointermove', handlePointerMove);
         window.addEventListener('resize', () => debounce(handleResize, 100, 'Chart2D-resize'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     
+    /*
     useEffect(() => {
-        if(dataset) debounce(() => renderDataset(dataset, viewport), 100, `ChartBase-${viewport.current.id}` ) ;
+        //if(dataset) debounce(() => renderDataset(dataset, viewport), 100, `ChartBase-${viewport.current.id}` ) ;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataset])
+    }, [update])
+    */
 
     const init = () => {
         var width = ref.current.clientWidth;
@@ -42,12 +51,11 @@ const ChartBase = ({ dataset, renderDataset }) => {
         geometry = new THREE.BoxGeometry( 1, 1, 1 );
         material = new THREE.MeshNormalMaterial();
         mesh = new THREE.Mesh( geometry, material );
-        viewport.current.mesh = mesh;
         mesh.position.set(0, 0, 0);
         scene.add( mesh );
         
         const size = 100;
-        const divisions = 16;
+        const divisions = 13; //16;
         const gridHelper = new THREE.GridHelper( size, divisions );
         gridHelper.rotation.x = Math.PI / 2;
         gridHelper.position.z = 1;
@@ -58,11 +66,14 @@ const ChartBase = ({ dataset, renderDataset }) => {
         renderer.setSize( ref.current.offsetWidth, ref.current.offsetHeight );
         ref.current.appendChild( renderer.domElement );
 
-        controls.current = new OrbitControls( camera, renderer.domElement );
-        controls.current.update();
+        const controls = new ChartControls( camera, renderer.domElement);
+        //controls.current = new OrbitControls( camera, renderer.domElement );
+        //controls.current.update();
 
         viewport.current.isInit = true;
         viewport.current.id = crypto.randomUUID();
+
+        dispatch({ type: ActionTypes.SET_VIEWPORT, payload: viewport });
     }
     
     const updateDepth = (value) => {
@@ -73,9 +84,33 @@ const ChartBase = ({ dataset, renderDataset }) => {
     const animate = () => {
         requestAnimationFrame( animate );
         if(controls.current) controls.current.update();
+        raycast();
         renderer.render( scene, camera );
     }
 
+    const raycast = () => {
+        const pointer = viewport.current.pointer;
+        if (!pointer) return;
+
+        raycaster.setFromCamera( pointer, camera );
+        // calculate objects intersecting the picking ray
+        const intersects = raycaster.intersectObjects( scene.children );
+        if (intersects.length === 0) return;
+
+        let pointerUV = null;
+        for ( let i = 0; i < intersects.length; i ++ ) {
+            if(intersects[i].uv)
+                pointerUV = intersects[i].uv
+        }
+
+        let pointerPixel = new THREE.Vector2();
+        pointerPixel.x = pointerUV.x * viewport.current.dataset.dataset.shape[1];
+        pointerPixel.y = pointerUV.y * viewport.current.dataset.dataset.shape[0];
+
+        viewport.current.pointerUV = pointerUV;
+        viewport.current.pointerPixel = pointerPixel;
+        dispatch({ type: ActionTypes.SET_VIEWPORT, payload: viewport });
+    }    
 
     const handleResize = () => {
         var width = ref.current.clientWidth;
@@ -95,8 +130,25 @@ const ChartBase = ({ dataset, renderDataset }) => {
         renderer.setSize( width, height );
     }
 
+    const handlePointerMove = (event) => {
+        var width = ref.current.clientWidth;
+        var height = ref.current.clientHeight;
+        var rect = ref.current.getBoundingClientRect();
+        const x = event.pageX - rect.left;
+        const y = event.pageY - rect.top;
+
+        const pointer = new THREE.Vector2();
+        pointer.x = ( x/ width ) * 2 - 1;
+        pointer.y = - ( y / height ) * 2 + 1;
+
+        viewport.current.pointer = pointer;
+    }
+
+    const p = viewport?.current?.pointerPixel;
+
     return (<div className='chart-2d'>
             <div className="viewport-3d" style={{width:'100%', height:'600px'}} ref={ref}></div>
+            <div> u:{ p?.x } v:{ p?.y }</div>
         </div>
     )
 }

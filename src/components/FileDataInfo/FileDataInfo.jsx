@@ -3,7 +3,6 @@ import { useAppState } from '../../state/AppState';
 import Divider from '../Divider/Divider';
 import { formatNumber } from '../../libraries/Format';
 import Select from '../Select/Select';
-import { useState } from 'react';
 import { ActionTypes } from '../../state';
 
 const FileDataInfo = () => {
@@ -31,15 +30,16 @@ const ViewerOptions = () => {
 const FileMetadataInspector = () => {
     const { state } = useAppState();
 
-    const dims = state?.activeMetadata?.dims;
-    const shape = state?.activeMetadata?.shape;
-    const min = formatNumber( state?.activeMetadata?.min);
-    const max = formatNumber( state?.activeMetadata?.max);
-    const isComplex = state?.activeMetadata?.isComplex ? 'Yes' : 'No';
+    const metadata = state?.activeDataset?.metadata;
+    const dims = metadata?.dims;
+    const shape = metadata?.shape;
+    const min = formatNumber( metadata?.min);
+    const max = formatNumber( metadata?.max);
+    const isComplex = metadata?.isComplex ? 'Yes' : 'No';
 
     return (<div className='file-metadata-inspector'>
         {
-            state.activeMetadata ? <div>
+            metadata ? <div>
                 <label>Metadata</label>
                 <Divider></Divider>
                 <FileDataInfoItem label={'Dim Count'} info={dims?.length}></FileDataInfoItem>
