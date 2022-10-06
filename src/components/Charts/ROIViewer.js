@@ -10,7 +10,7 @@ class ROIViewer {
         this.viewer = viewer;
         this.roi = null;
         this.mesh = null;
-        this.shape  = viewer.dataset.dataset.shape; //viewer.dataset.metadata.shape;
+        this.shape  = null; // i.e. [160, 640, 640]
         this.useBrush = true; // Is brush or eraser 
         this.brush = 5;
         this.mousedown = false;
@@ -48,9 +48,12 @@ class ROIViewer {
 
         const value = 255;
         const brush = this.brush;
+        const height = this.shape[0];
         const width = this.shape[1];
+        const dz = height * width * this.getDepth();
+
         if(brush === 1) {
-            this.roi[width * p.y + p.x] = value;
+            this.roi[p.x + width * p.y + dz] = this.useBrush ? value : 0;
         }
         if(brush >= 2) {
             for (let i = 0; i < brush * brush; i++) {
@@ -64,7 +67,7 @@ class ROIViewer {
                 const r2 = (brush / 2)*(brush / 2)
                 const isCircle = x2 + y2 <= r2
                 if (isCircle)
-                    this.roi[x + dy] = this.useBrush ? value : 0;
+                    this.roi[x + dy + dz] = this.useBrush ? value : 0;
             }
         }
 
@@ -73,6 +76,19 @@ class ROIViewer {
     }
 
     init = () => {
+        // Note: Dataset shape -> [depth, height, width] and ROI texture needs -> [hieght, width, depth]
+        const shape = this.viewer.dataset.metadata.shape; // i.e. [160, 640, 640]
+        this.shape = [...shape];
+
+        if(shape[2] === undefined)  {
+            shape[2] = 1;
+            return;
+        }
+
+        this.shape[0] = shape[1];
+        this.shape[1] = shape[2];
+        this.shape[2] = shape[0];
+
         // Initalize ROI layer        
         const length = this.shape[0] * this.shape[1] * this.shape[2]; 
         this.roi = new Uint8Array(length);
@@ -98,9 +114,7 @@ class ROIViewer {
     create2DTexture = () => {
         const data = this.roi;
         const shape = this.shape;
-        if(shape[2] === undefined) shape[2] = 1;
-
-        const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2] );
+        const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2]);
         texture.format = THREE.RedFormat;
         texture.needsUpdate = true;
         return texture;
@@ -108,10 +122,12 @@ class ROIViewer {
 
     createMaterial = (texture) => {
 
+        const depth = this.viewer.dataset.indices[0];
+
         const material = new THREE.ShaderMaterial( {
             uniforms: {
                 diffuse: { value: texture },
-                depth: { value: 0 },
+                depth: { value: depth },
                 size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
             },
             vertexShader: Chart2D_VertexShader,
@@ -122,7 +138,17 @@ class ROIViewer {
         return material;
     }
 
+    getDepth = () => {
+        if(!this?.mesh?.material?.uniforms[ "depth" ])
+            return 0;
+        return this.mesh.material.uniforms[ "depth" ].value
+    }
+
+    setDepth = (depth) => {
+        depth = depth < 0 ? 0 : depth;
+        depth = depth > this.shape[2] - 1 ? this.shape[2] - 1 : depth;
+        this.mesh.material.uniforms[ "depth" ].value = depth;
+    }
 }
 
 export default ROIViewer;
-

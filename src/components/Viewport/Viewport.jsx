@@ -38,8 +38,22 @@ const Viewport = () => {
         throttle(() => fetchData(), 1, 'FetchFileData');
     }
     
+    const handleKeyDown = (event) => {
+        event.preventDefault();
+        if (!state.activeDataset) return;
+
+        if (event.key === 'ArrowLeft') {
+            state.viewport.decrement_index();
+            handleIndexUpdate();
+        }
+        if (event.key === 'ArrowRight') {
+            state.viewport.increment_index();
+            handleIndexUpdate();
+        }
+    }
+
     return (
-        <div className='viewport'> 
+        <div className='viewport' tabIndex="0" onKeyDown={handleKeyDown}> 
             <ChartBase></ChartBase>
             { state.viewMode === '2D View' ? <ViewportControls onUpdate={handleIndexUpdate}></ViewportControls> : null }
         </div>
