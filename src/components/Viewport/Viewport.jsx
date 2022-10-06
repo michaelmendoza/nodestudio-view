@@ -3,10 +3,9 @@ import { useEffect } from 'react';
 import { useAppState, ActionTypes } from '../../state';
 import { debounce, throttle } from '../../libraries/Utils';
 import ViewportControls from './ViewportControls';
-import Chart2D from '../Charts/Chart2D';
-import Lightbox from '../Charts/Lightbox';
 import Dataset from '../../state/models/Dataset';
 import ChartBase from '../Charts/ChartBase';
+import ROIViewer from '../Charts/ROIViewer';
 
 const Viewport = () => {
 
@@ -25,13 +24,14 @@ const Viewport = () => {
         await dataset.fetchMetadata();
         await dataset.fetchDataset();
         dataset.render()
+
+        state.viewport.roi = new ROIViewer(state.viewport);
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
     }
 
     const fetchData = async () => {
         await state.activeDataset.fetchDataset();
         await state.activeDataset.render();
-        //dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: state.activeDataset });
     }
 
     const handleIndexUpdate = async () => {

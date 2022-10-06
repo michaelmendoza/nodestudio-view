@@ -9,7 +9,7 @@ class Dataset {
 
     constructor(file, viewport) {
         this.viewport = viewport;
-        this.viewport.current.dataset = this;
+        this.viewport.dataset = this;
 
         this.file = file;
         this.metadata = null;
@@ -98,8 +98,8 @@ class Dataset {
 
         const texture = this.create2DTexture()
 
-        if (this.viewport.current.mesh) {
-            this.viewport.current.mesh.material.uniforms[ "diffuse" ].value = texture;
+        if (this.viewport.mesh) {
+            this.viewport.mesh.material.uniforms[ "diffuse" ].value = texture;
         }
         else {
             const planeWidth = 100
@@ -108,8 +108,8 @@ class Dataset {
             const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
             const mesh = new THREE.Mesh( geometry, material );
     
-            this.viewport.current.scene.add( mesh );
-            this.viewport.current.mesh = mesh;            
+            this.viewport.scene.add( mesh );
+            this.viewport.mesh = mesh;            
         }
     }
 
@@ -169,8 +169,7 @@ class Dataset {
         mesh.position.x = offset.x;
         mesh.position.y = offset.y;
 
-        viewport.current.scene.add( mesh );
-        //viewport.current.mesh = mesh;
+        viewport.scene.add( mesh );
     }
 
 }

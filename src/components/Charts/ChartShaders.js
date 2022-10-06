@@ -34,3 +34,20 @@ void main() {
 
 }
 `;
+
+export const ROI_FragmentShader = `
+precision highp float;
+precision highp int;
+precision highp sampler2DArray;
+
+uniform sampler2DArray diffuse;
+in vec2 vUv;
+uniform int depth;
+
+out vec4 outColor;
+
+void main() {
+    vec4 color = texture( diffuse, vec3( vUv, depth ) );
+    outColor = vec4( color.r, color.g, color.b, 0.4 );
+}
+`;
