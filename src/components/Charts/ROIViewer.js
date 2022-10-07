@@ -10,7 +10,7 @@ class ROIViewer {
         this.viewer = viewer;
         this.roi = null;
         this.mesh = null;
-        this.shape  = null; // i.e. [160, 640, 640]
+        this.shape  = null; 
         this.useBrush = true; // Is brush or eraser 
         this.brush = 5;
         this.mousedown = false;
@@ -27,6 +27,8 @@ class ROIViewer {
 
     handleMouseDown = (event) => {
         console.log('ROI Activate')
+        if(event.button === 2) return;
+
         this.mousedown = true;
         this.updatePixel(this.viewer.pointerPixel);
     }

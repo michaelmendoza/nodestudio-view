@@ -8,9 +8,9 @@ const FileBrowserControls = ({ onLoad, onRefresh, onBack }) => {
     <div className='file-browser-controls'>
         <div className='layout-row-center layout-space-between'>
             <div>
-                <button onClick={onLoad}> Load Data in Folder </button>
+                <button className='button-dark' onClick={onLoad}> Load Data in Folder </button>
             </div>
-            <div className='controls-group'>
+            <div className='controls-group layout-row'>
                 <button className='button-icon' onClick={onRefresh}> <i className='material-icons'>refresh</i> </button>
                 <button className='button-icon' onClick={onBack}> <i className='material-icons'>expand_less</i> </button>
             </div>

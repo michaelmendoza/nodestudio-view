@@ -50,7 +50,6 @@ class Viewer {
 
     animate = () => {
         requestAnimationFrame( this.animate );
-
         this.raycast();
         this.renderer.render( this.scene, this.camera );
     }
@@ -95,8 +94,8 @@ class Viewer {
 
         this.pointerUV = pointerUV;
         this.pointerPixel = pointerPixel;
-        this.pointerPixel.x = Math.round(pointerPixel.x);
-        this.pointerPixel.y = Math.round(pointerPixel.y);
+        this.pointerPixel.x = Math.floor(pointerPixel.x);
+        this.pointerPixel.y = this.dataset.dataset.shape[0] - Math.floor(pointerPixel.y) - 1; 
 
         if (this.dispatch)
             this.dispatch({ type: ActionTypes.SET_VIEWPORT, payload: this });
@@ -128,8 +127,8 @@ class Viewer {
         const y = event.clientY - rect.top;
 
         const pointer = new THREE.Vector2();
-        pointer.x = ( x/ width ) * 2 - 1;
-        pointer.y = ( y / height ) * 2 - 1;
+        pointer.x = ( x / width ) * 2 - 1;
+        pointer.y = - (( y / height ) * 2 - 1);
 
         this.pointer = pointer;
     }

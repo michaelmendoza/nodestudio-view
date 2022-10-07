@@ -52,10 +52,21 @@ button {
   }
 }
 
+.button-dark {
+  color: #FEFEFE;
+  background-color: #3e4451;
+
+  &:hover {
+    color: #FEFEFE;
+    background-color: lighten(#3e4451, 20%);
+  }
+}
+
 .button-icon {
   border: none;
   margin: 0;
   padding: 1em 1.1em;
+  color: #FEFEFE;
 
   &:hover, &:focus, &:active {
     border: none;

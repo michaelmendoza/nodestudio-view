@@ -18,6 +18,9 @@ class ChartControls {
         // State properties
         this.state = STATE.NONE;
 
+        // Pan properties
+        this.sensitivity = 0.2;
+
         // Zoom properties
         this.enableZoom = true;
         this.zoomSpeed = 1.0;
@@ -27,8 +30,11 @@ class ChartControls {
 		this.zoom0 = this.camera.zoom;
 
         this.domElement.addEventListener( 'contextmenu', this.onContextMenu );
-		this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
-		this.domElement.addEventListener( 'pointercancel', this.onPointerCancel );
+        this.domElement.addEventListener( 'mouseup', this.handleMouseUp );
+        this.domElement.addEventListener( 'mouseleave', this.handleMouseUp );
+        this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+		this.domElement.addEventListener( 'pointercancel', this.handleMouseUp );
+        this.domElement.addEventListener( 'mousemove', this.onMouseMove );
 		this.domElement.addEventListener( 'wheel', this.onMouseWheel.bind(this), { passive: false } );
     }
 
@@ -38,16 +44,28 @@ class ChartControls {
         this.state = STATE.NONE;
     };
 
-    onContextMenu = () => { 
+    onContextMenu = (event) => { 
+        event.preventDefault();
+        this.state = STATE.PAN;
+    }
 
+    handleMouseUp = (event) => {
+        console.log('ROI Deactivate');
+        this.state = STATE.NONE;
     }
 
     onPointerDown = () => { 
 
     }
 
-    onPointerCancel = () => { 
+    onMouseMove = (event) => {
+        event.preventDefault();
 
+        if (this.state === STATE.PAN) {
+            this.camera.position.x -= this.sensitivity * (1 / this.camera.zoom) * event.movementX;
+            this.camera.position.y += this.sensitivity * (1 / this.camera.zoom) * event.movementY;
+            this.camera.updateProjectionMatrix();
+        }
     }
 
     onMouseWheel = (event) => { 
