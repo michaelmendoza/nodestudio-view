@@ -103,7 +103,7 @@ class Viewer {
 
     handleResize = () => {
         var width = this.ref.current.clientWidth;
-        var height = this.ref.current.clientHeight;
+        var height = this.ref.current.clientHeight; 
         var aspect = width / height;
         console.log(`Resized to: ${width}, ${height}, ${aspect}`);
 

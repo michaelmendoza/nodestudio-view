@@ -4,6 +4,9 @@ import APIDataService from "../../services/APIDataService";
 
 import * as THREE from 'three';
 import { Chart2D_FragmentShader, Chart2D_VertexShader } from "../../components/Charts/ChartShaders";
+import { throttle } from "../../libraries/Utils";
+import Contrast from './Contrast';
+
 
 class Dataset {
 
@@ -21,6 +24,8 @@ class Dataset {
 
         this.key = '[0,:,:]';
         this.update = 0;
+
+        this.contrast = new Contrast();
     }
 
     setViewMode = (viewMode) => {
@@ -38,6 +43,9 @@ class Dataset {
         this.metadata = await APIDataService.getFileMetadata(this.file.id);
         this.indices = generateDefaultIndices(this.metadata.shape);
         this.maxIndices = this.metadata.shape.map((value) => value - 1); 
+
+        // If not encoded 
+        //this.contrast.autoContrastMinMax(this.metadata.min, this.metadata.max);
     }
 
     /** Fetches Dataset from API */
@@ -51,13 +59,24 @@ class Dataset {
         if (data.isEncoded) {
             data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
         } 
-        this.dataset = scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
+
+        this.dataset = data;
+        this.dataset = scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype, useContrast:true, contrast: this.contrast })
         this.update++;
     }
 
     render = () => {
         if(this.viewMode === '2D View') this.render2D();
         if(this.viewMode === 'Lightbox') this.renderDataset();
+    }
+
+    updateRender = async () => {
+        const _render = async() => {
+            await this.fetchDataset();
+            await this.render();
+        }
+
+        throttle(() => _render(), 1, 'Dataset-Update');
     }
 
     create2DTexture = () => {

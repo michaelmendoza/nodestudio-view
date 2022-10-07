@@ -17,11 +17,11 @@ const App = () => {
 
 const AppComponents = () => {
     return (
-        <div>
+        <div className='app-components'>
             <header className="header"> 
                 <div> NodeStudio Viewer</div>
             </header>
-            <div>
+            <div className='main-components'>
                 <SideView></SideView>
                 <Viewport></Viewport>
             </div>

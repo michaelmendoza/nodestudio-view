@@ -1,12 +1,16 @@
 
-export const scaleDataset = ({ data, shape, min, max }) => {
-    // Fix min/max scaling 
+/**
+ * Scales data to range of 0 - 255 values. Has the option of using contrast calculations or 
+ * just doing a simple scaling between min/max values
+ */
+export const scaleDataset = ({ data, shape, min, max, useContrast = false, contrast }) => {
     const resolution = 255;
     const length = shape.reduce((a,b) => a * b); //shape[0] * shape[1];
     const uint8Array = new Uint8Array(length);
     for (var i = 0; i < length; i++) {
         const value = data[i];
-        const scaled_value = (value - min) * resolution / (max - min)
+        const fractional_value = useContrast ? contrast.contrastLUT(value, true) : (value - min) / (max - min); 
+        const scaled_value = fractional_value * resolution;
         uint8Array[i] = scaled_value;
     }
 

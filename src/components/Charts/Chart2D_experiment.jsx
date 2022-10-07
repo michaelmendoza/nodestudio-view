@@ -198,7 +198,7 @@ const Chart2D = ({ dataset, drawUpdate }) => {
     }
 
     return (<div className='chart-2d'>
-            <div className="viewport-3d" style={{width:'100%', height:'600px'}} ref={ref}></div>
+            <div className="webgl-viewport" style={{width:'100%', height:'600px'}} ref={ref}></div>
             <Slider onChange={updateDepth} max={8}></Slider>
         </div>
     )

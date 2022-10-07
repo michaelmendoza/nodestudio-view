@@ -8,15 +8,33 @@ import Slider from '../Slider/Slider';
 import { useState } from 'react';
 
 const FileDataInfo = () => {
-    
+    const { state } = useAppState();
+
     return (<div className='file-data-info'>
-        <ViewerOptions></ViewerOptions>
-        <Divider></Divider>
-
         <FileMetadataInspector></FileMetadataInspector>
-        <Divider></Divider>
-
+        { state.activeDataset ? <ContrastOptions></ContrastOptions> : null }
+        <ViewerOptions></ViewerOptions>
         <ROIControls></ROIControls>
+    </div>)
+}
+
+const ContrastOptions = () => {
+    const { state } = useAppState();
+
+    const updateContrastLevel = (value) => {
+        state.activeDataset.contrast.level = value;
+        state.activeDataset.updateRender();
+    }
+
+    const updateContrastWindow = (value) => {
+        state.activeDataset.contrast.window = value;
+        state.activeDataset.updateRender();
+    }
+
+    return (<div className='viewer-options'>
+        <label>Contrast</label>
+        <Slider label='Level' value={state.activeDataset.contrast.level} onChange={updateContrastLevel} max={4096}></Slider> 
+        <Slider label='Window' value={state.activeDataset.contrast.window} onChange={updateContrastWindow} max={4096}></Slider> 
         <Divider></Divider>
     </div>)
 }
@@ -24,22 +42,16 @@ const FileDataInfo = () => {
 const ViewerOptions = () => {
     const { state, dispatch } = useAppState();
     const viewOptions = ['2D View', '3D View', 'Lightbox']
-    const [constrastLevel, setContrastLevel] = useState(2048);
-    const [constrastWidth, setContrastWidth] = useState(2048);
-
 
     const handleViewModeUpdate = (mode) => {
         dispatch({ type:ActionTypes.SET_VIEW_MODE, payload: mode })
     }
 
     return (<div className='viewer-options'>
-        <div className='viewer-item'> <label>View</label> <Select options={viewOptions} value={state.viewMode} onChange={handleViewModeUpdate}></Select>  </div>
+        <div className='viewer-item'> 
+            <label>View</label> <Select options={viewOptions} value={state.viewMode} onChange={handleViewModeUpdate}></Select>  
+        </div>
         <Divider></Divider>
-
-        <label>Contrast</label>
-        <Slider label='Level' value={constrastLevel} onChange={(value) => { setContrastLevel(value) }} max={4096}></Slider> 
-        <Slider label='Window' value={constrastWidth} onChange={(value) => { setContrastWidth(value) }} max={4096}></Slider> 
-
     </div>)
 }
 
@@ -57,12 +69,15 @@ const FileMetadataInspector = () => {
         {
             metadata ? <div>
                 <label>Metadata</label>
-                <FileDataInfoItem label={'Dim Count'} info={dims?.length}></FileDataInfoItem>
-                <FileDataInfoItem label={'Dims'} info={JSON.stringify(dims)?.replace(/"/g, '')}></FileDataInfoItem>
-                <FileDataInfoItem label={'Shape'} info={ JSON.stringify(shape)}></FileDataInfoItem>
-                <FileDataInfoItem label={'Min'} info={min}></FileDataInfoItem>
-                <FileDataInfoItem label={'Max'} info={max}></FileDataInfoItem>
-                <FileDataInfoItem label={'isComplex'} info={isComplex}></FileDataInfoItem>
+                <div className='file-metadata-list'>
+                    <FileDataInfoItem label={'Dim Count'} info={dims?.length}></FileDataInfoItem>
+                    <FileDataInfoItem label={'Dims'} info={JSON.stringify(dims)?.replace(/"/g, '')}></FileDataInfoItem>
+                    <FileDataInfoItem label={'Shape'} info={ JSON.stringify(shape)}></FileDataInfoItem>
+                    <FileDataInfoItem label={'Min'} info={min}></FileDataInfoItem>
+                    <FileDataInfoItem label={'Max'} info={max}></FileDataInfoItem>
+                    <FileDataInfoItem label={'isComplex'} info={isComplex}></FileDataInfoItem>
+                </div>
+                <Divider></Divider>
             </div> : null
         }
     </div>)
@@ -92,6 +107,7 @@ const ROIControls = () => {
         <label>ROI Controls</label>
         <Select options={brushOptions} value={brushType} onChange={updateBrushType}></Select> 
         <Slider label='Brush Size' value={brushSize} onChange={updateBrushSize} max={50}></Slider> 
+        <Divider></Divider>
     </div>)
 }
 

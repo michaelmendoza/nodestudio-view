@@ -21,9 +21,11 @@ const ChartBase = () => {
     }
 
     //const p = state?.viewport?.pointerPixel;
-
+    const height = (window.innerHeight - 100).toString() + 'px'; 
+    //console.log(height);
     return (<div className='chart-2d'>
-            <div className="viewport-3d" style={{width:'100%', height:'600px'}} ref={ref}></div>
+            <div className='webgl-viewport' style={{width:'100%', height:height}} ref={ref}>
+            </div>
             { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
         </div>
     )
