@@ -24,7 +24,9 @@ const FileDataInfo = () => {
 const ViewerOptions = () => {
     const { state, dispatch } = useAppState();
     const viewOptions = ['2D View', '3D View', 'Lightbox']
-    const [constrast, setContrast] = useState(2048);
+    const [constrastLevel, setContrastLevel] = useState(2048);
+    const [constrastWidth, setContrastWidth] = useState(2048);
+
 
     const handleViewModeUpdate = (mode) => {
         dispatch({ type:ActionTypes.SET_VIEW_MODE, payload: mode })
@@ -34,8 +36,10 @@ const ViewerOptions = () => {
         <div className='viewer-item'> <label>View</label> <Select options={viewOptions} value={state.viewMode} onChange={handleViewModeUpdate}></Select>  </div>
         <Divider></Divider>
 
-        <div>Contrast</div>
-        <Slider value={constrast} onChange={(value) => { setContrast(value) }} max={4096}></Slider> 
+        <label>Contrast</label>
+        <Slider label='Level' value={constrastLevel} onChange={(value) => { setContrastLevel(value) }} max={4096}></Slider> 
+        <Slider label='Window' value={constrastWidth} onChange={(value) => { setContrastWidth(value) }} max={4096}></Slider> 
+
     </div>)
 }
 
@@ -87,7 +91,7 @@ const ROIControls = () => {
     return (<div className='roi-controls'>
         <label>ROI Controls</label>
         <Select options={brushOptions} value={brushType} onChange={updateBrushType}></Select> 
-        <Slider value={brushSize} onChange={updateBrushSize} max={50}></Slider> 
+        <Slider label='Brush Size' value={brushSize} onChange={updateBrushSize} max={50}></Slider> 
     </div>)
 }
 

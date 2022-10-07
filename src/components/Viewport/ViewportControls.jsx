@@ -20,11 +20,11 @@ const ViewportControls = ({ onUpdate }) => {
         onUpdate();
     }
 
+    const dims = state?.viewport?.dataset?.metadata?.dims;
     return (<div className='viewport-controls'>
         {
             keys.map((key) => <div key={key} className='viewport-control-item  layout-row-center'> 
-                <div className='label'> {key} </div> 
-                <Slider value={indices[key]} onChange={(value) => handleIndexUpdate(key, value)} max={maxIndices[key]}></Slider> 
+                <Slider label={dims[key]} value={indices[key]} onChange={(value) => handleIndexUpdate(key, value)} max={maxIndices[key]}></Slider> 
             </div>)
         }
     </div>)

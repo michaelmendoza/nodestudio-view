@@ -34,7 +34,7 @@ class Viewer {
         this.scene = new THREE.Scene();
 
         const size = 100;
-        const divisions = 13;
+        const divisions = 1;
         const gridHelper = new THREE.GridHelper( size, divisions );
         gridHelper.rotation.x = Math.PI / 2;
         gridHelper.position.z = 1;

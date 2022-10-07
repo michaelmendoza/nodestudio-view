@@ -20,11 +20,11 @@ const ChartBase = () => {
         dispatch({ type: ActionTypes.SET_VIEWPORT, payload: viewer });
     }
 
-    const p = state?.viewport?.pointerPixel;
+    //const p = state?.viewport?.pointerPixel;
 
     return (<div className='chart-2d'>
             <div className="viewport-3d" style={{width:'100%', height:'600px'}} ref={ref}></div>
-            <div> u:{ p?.x } v:{ p?.y }</div>
+            { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
         </div>
     )
 }
