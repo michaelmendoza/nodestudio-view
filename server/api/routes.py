@@ -31,9 +31,9 @@ async def get_files():
 
 @router.get("/files/add")
 @handle_exception
-async def read_file(filepath: str, filename: str):
+async def read_file(filepath: str, filename: str = ''):
     ''' Reads files in filepath '''
-    data = controllers.read_file(filepath)
+    data = controllers.read_file(filepath, filename)
     return { 'message': 'Read file', 'data': data }
 
 @router.get("/files/data")
@@ -49,6 +49,13 @@ async def get_metadata(id: str):
     ''' Gets metadata for given id '''
     data = controllers.get_metadata(id)
     return { 'message': 'Retrieved metadata', 'data': data }
+
+@router.get("/files/preview")
+@handle_exception
+async def get_file_preview_img(id: str, size: int = 128):
+    ''' Retrieves all loaded files '''
+    data = controllers.get_file_preview_img(id, size)
+    return { 'message': 'Generated preview img', 'data': data }
 
 @router.get("/path/query")
 @handle_exception

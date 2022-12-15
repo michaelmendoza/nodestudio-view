@@ -6,11 +6,15 @@ import FileBrowserControls from './FileBrowserControls';
 import FileBrowserItem from './FileBrowserItem';
 import { useAppState } from '../../state/AppState';
 import { ActionTypes } from '../../state';
+import FileNamingModal from './FileNamingModal';
 
 const FileBrowser = ({onSelect}) => {
     const { dispatch } = useAppState();
     const [relativePath, setRelativePath] = useState('data');
     const [pathInfo, setPathInfo] = useState({ path:'', folders:[], files:[] });
+    const [showModal, setShowModal] = useState(false);
+    const [filename, setFilename] = useState('');
+    const [path, setPath] = useState('');
 
     useEffect(()=>{
         const fetch = async() => {
@@ -23,12 +27,13 @@ const FileBrowser = ({onSelect}) => {
     },[relativePath])
 
     const handleFileItemSelect = (item, type) => {
-        const path = relativePath.concat("/", item)    
+        const _path = relativePath.concat("/", item)    
         if (type === 'folder') {
-            setRelativePath(path);
+            setRelativePath(_path);
         }
         if (type === 'file') {
-            loadFile(path);
+            preLoadFile(_path);
+            //loadFile(path);
         }
     }
 
@@ -43,16 +48,23 @@ const FileBrowser = ({onSelect}) => {
         setPathInfo(await APIDataService.getPathQuery(relativePath));
     }
 
-    const loadFile = async (path) => {
+    const preLoadFile = (_path) => {
+        setShowModal(true);
+        setPath(_path);
+    }
+
+    const loadFile = async () => {
         //dispatch({ type:ActionTypes.SET_SIDENAV_SHOW, show: false })
-        await APIDataService.addFiles(path);
+        await APIDataService.addFiles(path, filename);
         let files = await APIDataService.getFiles();
         dispatch({ type:ActionTypes.SET_FILES, files });
         if(onSelect) onSelect();
     }
 
     const handleFileLoad = async () => {
-        loadFile(pathInfo.path);
+        setPath(pathInfo.path);
+        preLoadFile(pathInfo.path);
+        //loadFile(pathInfo.path);
     }
 
     return (
@@ -69,6 +81,7 @@ const FileBrowser = ({onSelect}) => {
                 pathInfo.files.map((item, index)=> <FileBrowserItem key={index} item={item} type={'file'} onSelect={handleFileItemSelect}></FileBrowserItem>)
             }
         </div>
+        <FileNamingModal showModal={showModal} setShowModal={setShowModal} filename={filename} setFilename={setFilename} loadFile={loadFile}></FileNamingModal>
     </div>
     )
 }

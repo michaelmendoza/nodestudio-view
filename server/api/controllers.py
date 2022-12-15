@@ -1,5 +1,8 @@
+import math
 import base64
 import numpy as np
+from io import BytesIO
+from PIL import Image
 from core import io, path
 
 def get_path_query(relative_path):
@@ -9,8 +12,8 @@ def get_path_query(relative_path):
 def get_files():
     return io.get_files()
 
-def read_file(filepath):
-    io.read_file(filepath)
+def read_file(filepath, filename: str = ''):
+    io.read_file(filepath, filename)
     return get_files()
     
 def encode_data(data, min, max, dtype='uint16'):
@@ -59,3 +62,36 @@ def get_data(fileid, key, encode = True):
 def get_metadata(fileid):
     dataset = io.get_filedata(fileid)
     return { 'shape': dataset['shape'], 'dims': dataset['dims'] , 'min': dataset['min'], 'max': dataset['max'], 'isComplex': dataset['isComplex'] }
+
+
+def get_file_preview_img(fileid, size = 128):
+    dataset = io.get_filedata(fileid)
+    
+    ''' Generate key for preview img'''
+    shape = dataset['shape']
+    indices = [math.floor(s / 2) for s in shape ]
+    key = '['
+    for dim, index in enumerate(indices):
+        if dim == 1 or dim == 2:
+            key += ':'
+        else:
+            key += str(index)
+        if dim < len(indices) - 1:
+            key += ','
+    key += ']'
+
+    data = dataset['data']
+    data = eval(f'data{key}')
+
+    if np.iscomplexobj(data):
+        data = np.abs(data)
+    min = float(np.nanmin(data))
+    max = float(np.nanmax(data))
+    scaled_data = (data - min) * 255 / (max - min)
+    scaled_data = np.uint8(scaled_data)
+
+    buffered = BytesIO()
+    im = Image.fromarray(np.uint8(scaled_data))
+    im = im.resize((size, size))
+    im.save(buffered, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()

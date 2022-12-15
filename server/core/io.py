@@ -16,8 +16,10 @@ def get_filedata(id):
 def get_files():
     return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'] } for file in files_loaded.values() ]
 
-def read_file(filepath, id = None):
+def read_file(filepath, name: str = '', id = None):
     id = uuid.uuid1().hex if id == None else id
+    if name == '':
+        name =  f'File {len(files_loaded)}'
 
     ''' Detects valid files in filepath and reads file, and places data in io datastore '''
     if os.path.isdir(filepath):
@@ -26,20 +28,20 @@ def read_file(filepath, id = None):
         paths = glob.glob(filepath + '*.dat') 
         for filename in paths:
             id = uuid.uuid1().hex
-            files_loaded[id] = { 'id':id, 'path':filename, 'name':f'File {len(files_loaded)}', 'type':'raw data', 'data': read_rawdata(filename)} 
+            files_loaded[id] = { 'id':id, 'path':filename, 'name':name, 'type':'raw data', 'data': read_rawdata(filename)} 
 
         # Read raw data files in folder (load one dataset/datagroup per folder)
         paths = glob.glob(filepath + '*.dcm')        
         paths.extend(glob.glob(filepath + '*.ima'))
         if len(paths) > 0:
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':f'File {len(files_loaded)}', 'type':'dicom', 'data': read_dicom(filepath)}  
+            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
     else:
         # Check for file extension and read dicom / raw data files
         filename, file_extension = os.path.splitext(filepath)
         if file_extension == '.dat':
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':f'File {len(files_loaded)}', 'type':'raw data', 'data': read_rawdata(filepath)}  
+            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'raw data', 'data': read_rawdata(filepath)}  
         if file_extension == '.dcm' or file_extension == '.ima':
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':f'File {len(files_loaded)}', 'type':'dicom', 'data': read_dicom(filepath)}  
+            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
     
     return id
 
