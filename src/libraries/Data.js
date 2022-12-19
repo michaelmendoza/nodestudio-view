@@ -26,6 +26,7 @@ export const decodeDataset = ({ data, shape, min, max, dtype }) => {
     return dataset
 }
 
+/** Converts a base64 string to a 8 or 16 bit array */
 export const base64ToPixelArray = ({ data, dtype = 'uint16' }) => {
     const rawString = window.atob(data); // data should be base64encoded
 
@@ -36,6 +37,23 @@ export const base64ToPixelArray = ({ data, dtype = 'uint16' }) => {
     
     const pixelArray = dtype === 'uint16' ? new Uint16Array(uint8Array.buffer) : uint8Array;
     return pixelArray;
+}
+
+/** Converts a 8bit array to a base64 string */
+export const pixelArrayToBase64 = async (data) => {
+    // Use a FileReader to generate a base64 data URI
+    const base64url = await new Promise((r) => {
+        const reader = new FileReader()
+        reader.onload = () => r(reader.result)
+        reader.readAsDataURL(new Blob([data]))
+    })
+
+    /*
+    The result looks like 
+    "data:application/octet-stream;base64,<your base64 data>", 
+    so we split off the beginning:
+    */
+    return base64url.split(",", 2)[1]
 }
 
 export const datasetToPointCloud = (pixelArray, shape) => {

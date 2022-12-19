@@ -95,3 +95,60 @@ def get_file_preview_img(fileid, size = 128):
     im = im.resize((size, size))
     im.save(buffered, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
+
+def export_roi_data(roi_data, shape): 
+    decoded = base64.b64decode(roi_data)
+    decoded = np.frombuffer(decoded, dtype=np.uint8)
+    indices = np.nonzero(decoded)
+
+    SliceIndices = {}
+    for index in indices[0].tolist():
+        z = math.floor(index / (shape[0] * shape[1]))
+        dz = index % (shape[0] * shape[1])
+        y = math.floor(dz / shape[0])
+        x = dz % (shape[1])
+
+        if z in SliceIndices.keys():
+            SliceIndices[z].append((y,x))
+        else:
+            SliceIndices[z] = [(y,x)]
+
+    import os
+    roi_path = os.path.join(os.getcwd(), 'roi', '')
+    roi_path_exists = os.path.exists(roi_path)
+    if not roi_path_exists:
+        os.mkdir(roi_path)
+
+    filepaths = []
+    for z in SliceIndices.keys():
+        im = np.zeros((shape[1], shape[0]), dtype=np.uint8)
+        for idx in SliceIndices[z]:
+            im[idx[0], idx[1]] = 255
+
+        from PIL import Image
+        im = Image.fromarray(im)
+        filename = f"./roi/test-{z}.png"
+        im.save(filename)
+        filepaths.append(filename)
+
+    from zipfile import ZipFile
+
+    roi_filepath = './roi/roi_images.zip'
+    with ZipFile(roi_filepath, 'w') as zip:
+        # writing each file one by one
+        for file in filepaths:
+            zip.write(file)
+
+    import os
+    import glob
+
+    files = glob.glob('./roi/*.png')
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
+    message = f'All {len(filepaths)} files zipped successfully!'
+    print(message)
+    return message 

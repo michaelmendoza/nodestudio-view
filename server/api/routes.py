@@ -1,8 +1,11 @@
 import traceback
-from typing import Any, List
+from typing import Any, List, Dict
+from pydantic import BaseModel
 from functools import wraps
 from xmlrpc.client import Boolean
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
+
 
 from api import controllers
 
@@ -64,3 +67,20 @@ async def get_path_query(path: str):
     data = controllers.get_path_query(path)
     return { 'message': 'Retrieved path filesystem query', 'data': data }
 
+class ROIData(BaseModel):
+    roi_data: str
+    shape: List[int] = []
+
+@router.post("/roi/export")
+@handle_exception
+async def export_roi_data(data: ROIData):
+    ''' Exports ROI Data '''
+    data = controllers.export_roi_data(data.roi_data, data.shape)
+    return { 'message': 'Exported ROI Data into roi_images.zip file.', 'data': data }
+
+@router.get("/roi/download")
+async def download():
+    filepath = './roi/roi_images.zip'
+    return FileResponse(filepath,  media_type="application/octet-stream", filename='roi_images.zip')
+    
+    

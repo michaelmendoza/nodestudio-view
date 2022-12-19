@@ -6,6 +6,7 @@ import Select from '../Select/Select';
 import { ActionTypes } from '../../state';
 import Slider from '../Slider/Slider';
 import { useState } from 'react';
+import APIDataService from '../../services/APIDataService';
 
 const FileDataInfo = () => {
     const { state } = useAppState();
@@ -103,10 +104,17 @@ const ROIControls = () => {
         setBrushSize(value);
     }
 
+    const exportROIData = async () => {
+        const data = await state.viewport.roi.export();
+        await APIDataService.exportROIData(data.data, data.shape);
+        APIDataService.exportDownload();
+    }
+
     return (<div className='roi-controls'>
         <label>ROI Controls</label>
         <Select options={brushOptions} value={brushType} onChange={updateBrushType}></Select> 
         <Slider label='Brush Size' value={brushSize} onChange={updateBrushSize} max={50}></Slider> 
+        <button className='export-roi button-dark' onClick={exportROIData}> Export ROI </button>
         <Divider></Divider>
     </div>)
 }

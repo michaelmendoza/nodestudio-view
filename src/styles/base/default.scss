@@ -56,7 +56,7 @@ button {
   color: #FEFEFE;
   background-color: #3e4451;
 
-  &:hover {
+  &:hover, &:focus, &:active {
     color: #FEFEFE;
     background-color: lighten(#3e4451, 20%);
   }

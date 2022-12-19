@@ -2,6 +2,8 @@
 
 # application specific 
 /data
+/roi
+package-lock.json 
 package_lock.json 
 
 # dependencies

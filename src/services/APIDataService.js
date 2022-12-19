@@ -1,6 +1,6 @@
 import { fetchAPI, FetchTypes } from "./FetchUtils";
 
-export const dataUrl = process.env.REACT_APP_API_URL || 'http://localhost:8001/api';
+export const dataUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
 
 const APIDataService = {
 
@@ -20,6 +20,14 @@ const APIDataService = {
    
     getPathQuery: (path = '') => fetchAPI(`${dataUrl}/path/query?path=${path}`, FetchTypes.GET),
     
+    // ************* FileSystem Path *************
+
+    exportROIData: (roi_data, shape) => fetchAPI(`${dataUrl}/roi/export`, FetchTypes.POST, {roi_data, shape}),
+
+    exportDownload: () => window.location.href = `${dataUrl}/roi/download`,
+
+    exportDownload2: () => fetchAPI(`${dataUrl}/roi/download`, FetchTypes.FILE),
+
 }
 
 export default APIDataService;

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { pixelArrayToBase64 } from '../../libraries/Data';
 import { throttle } from '../../libraries/Utils';
 import { Chart2D_VertexShader, ROI_FragmentShader } from "./ChartShaders";
 
@@ -150,6 +151,14 @@ class ROIViewer {
         depth = depth < 0 ? 0 : depth;
         depth = depth > this.shape[2] - 1 ? this.shape[2] - 1 : depth;
         this.mesh.material.uniforms[ "depth" ].value = depth;
+    }
+
+    export = async () => {
+        const data = this.roi;
+        const shape = this.shape;
+
+        const encoded = await pixelArrayToBase64(data);
+        return { data: encoded, shape };
     }
 }
 
