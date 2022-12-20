@@ -4,6 +4,7 @@ import './App.scss';
 import AppState from './state/AppState';
 import Viewport from './components/Viewport/Viewport';
 import SideView from './components/SideView.jsx/SideView';
+import LoadingModal from './components/LoadingModal/LoadingModal';
 
 const App = () => {
     return (
@@ -25,6 +26,7 @@ const AppComponents = () => {
                 <SideView></SideView>
                 <Viewport></Viewport>
             </div>
+            <LoadingModal></LoadingModal>
         </div>
     );
 }

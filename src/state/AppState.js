@@ -9,7 +9,8 @@ const initialState  = {
     activeFile: null,
     activeDataset: null,
     viewMode: '2D View',
-    viewport: null
+    viewport: null,
+    loading: { show: false, message: '' }
 };
 
 /**

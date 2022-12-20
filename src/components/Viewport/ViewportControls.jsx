@@ -16,16 +16,20 @@ const ViewportControls = ({ onUpdate }) => {
         console.log(index, value);
         state.activeDataset.updateIndex(index, value);
         if (index === 0)
-            state.viewport.roi.setDepth(value);
+            state.viewport?.roi?.setDepth(value);
         onUpdate();
     }
 
     const dims = state?.viewport?.dataset?.metadata?.dims;
     return (<div className='viewport-controls'>
         {
-            keys.map((key) => <div key={key} className='viewport-control-item  layout-row-center'> 
-                <Slider label={dims[key]} value={indices[key]} onChange={(value) => handleIndexUpdate(key, value)} max={maxIndices[key]}></Slider> 
-            </div>)
+            keys?.map((key) => { 
+                const label = dims ? dims[key] : '';
+                const value = indices ? indices[key] : 0;
+                const max = maxIndices ? maxIndices[key] : 1;
+                return <div key={key} className='viewport-control-item  layout-row-center'> 
+                <Slider label={label} value={value} onChange={(value) => handleIndexUpdate(key, value)} max={max}></Slider> 
+            </div>})
         }
     </div>)
 }

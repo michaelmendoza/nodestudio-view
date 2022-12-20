@@ -120,6 +120,8 @@ class Viewer {
     }
 
     handlePointerMove = (event) => {
+        if(!this.ref.current) return;
+
         var width = this.ref.current.clientWidth;
         var height = this.ref.current.clientHeight;
         var rect = this.ref.current.getBoundingClientRect();

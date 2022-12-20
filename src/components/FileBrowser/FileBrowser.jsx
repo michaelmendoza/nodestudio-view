@@ -54,11 +54,14 @@ const FileBrowser = ({onSelect}) => {
     }
 
     const loadFile = async () => {
-        //dispatch({ type:ActionTypes.SET_SIDENAV_SHOW, show: false })
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Load DataFile ...' } });
+
         await APIDataService.addFiles(path, filename);
         let files = await APIDataService.getFiles();
         dispatch({ type:ActionTypes.SET_FILES, files });
         if(onSelect) onSelect();
+
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
     }
 
     const handleFileLoad = async () => {

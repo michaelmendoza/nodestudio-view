@@ -1,5 +1,5 @@
 import './FileDataList.scss';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppState, ActionTypes } from '../../state';
 import Divider from '../Divider/Divider';
 import APIDataService from '../../services/APIDataService';
@@ -36,8 +36,8 @@ const FileDataList = () => {
     }
 
     return ( <div className='filedatalist'>
-        <label> Active File: </label>
-        <div> { state.activeFile?.name ? state.activeFile?.name : 'Please load file' } </div>
+        
+        <label className='active-file-label'> Active File:  { state.activeFile?.name ? state.activeFile?.name : 'Please load file to view.' }</label>
         
         <Divider></Divider>
 

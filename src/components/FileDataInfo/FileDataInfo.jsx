@@ -89,7 +89,7 @@ const FileDataInfoItem = ({label, info}) => {
 }
 
 const ROIControls = () => {
-    const { state } = useAppState();
+    const { state, dispatch } = useAppState();
     const brushOptions = ['Brush', 'Erase']
     const [brushType, setBrushType] = useState('Brush');
     const [brushSize, setBrushSize] = useState(5);
@@ -105,9 +105,11 @@ const ROIControls = () => {
     }
 
     const exportROIData = async () => {
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Exporting ROI Masks ...' } });
         const data = await state.viewport.roi.export();
         await APIDataService.exportROIData(data.data, data.shape);
         APIDataService.exportDownload();
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
     }
 
     return (<div className='roi-controls'>

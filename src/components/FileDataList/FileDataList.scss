@@ -1,6 +1,10 @@
 
 .filedatalist {
     
+    .active-file-label {
+        text-align: left;
+    }
+
     .filedata-item {
         display: flex;
         align-items: center;

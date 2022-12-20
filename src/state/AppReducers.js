@@ -7,7 +7,8 @@ export const ActionTypes = {
     'SET_ACTIVE_FILE': count(),
     'SET_ACTIVE_DATASET': count(),
     'SET_VIEW_MODE': count(),
-    'SET_VIEWPORT': count()
+    'SET_VIEWPORT': count(),
+    'SET_LOADING_STATUS': count(),
 }
 
 export const AppReducers = (state, action) => {
@@ -33,6 +34,9 @@ export const AppReducers = (state, action) => {
         // Viewport
         case ActionTypes.SET_VIEWPORT:
             return { ...state, viewport: action.payload }
+
+        case ActionTypes.SET_LOADING_STATUS:
+            return { ...state, loading: action.payload }
 
         default:
             return state;

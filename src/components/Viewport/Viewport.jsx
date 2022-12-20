@@ -19,6 +19,8 @@ const Viewport = () => {
     const fetch = async () => {
         if (!state.activeFile) return;
 
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Loading data ...' } });
+
         const dataset = new Dataset(state.activeFile, state.viewport);
         dataset.setViewMode(state.viewMode);
         await dataset.fetchMetadata();
@@ -28,6 +30,9 @@ const Viewport = () => {
         if(!state.viewport.roi)        
             state.viewport.roi = new ROIViewer(state.viewport);
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
+
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
+
     }
 
     const fetchData = async () => {
@@ -36,7 +41,7 @@ const Viewport = () => {
     }
 
     const handleIndexUpdate = async () => {
-        throttle(() => fetchData(), 1, 'FetchFileData');
+        throttle(() => fetchData(), 50, 'FetchFileData');
     }
     
     const handleKeyDown = (event) => {

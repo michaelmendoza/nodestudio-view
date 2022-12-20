@@ -76,7 +76,7 @@ class Dataset {
             await this.render();
         }
 
-        throttle(() => _render(), 1, 'Dataset-Update');
+        throttle(() => _render(), 50, 'Dataset-Update');
     }
 
     create2DTexture = () => {
