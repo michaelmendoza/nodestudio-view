@@ -7,6 +7,7 @@ import { ActionTypes } from '../../state';
 import Slider from '../Slider/Slider';
 import { useState } from 'react';
 import APIDataService from '../../services/APIDataService';
+import Status from '../../state/models/Status';
 
 const FileDataInfo = () => {
     const { state } = useAppState();
@@ -105,11 +106,11 @@ const ROIControls = () => {
     }
 
     const exportROIData = async () => {
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Exporting ROI Masks ...' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Exporting ROI Masks ...' }) });
         const data = await state.viewport.roi.export();
         await APIDataService.exportROIData(data.data, data.shape);
         APIDataService.exportDownload();
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false, message: '' }) });
     }
 
     return (<div className='roi-controls'>

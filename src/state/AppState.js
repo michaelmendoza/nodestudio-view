@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { AppReducers } from './AppReducers';
+import Status from './models/Status';
 
 /**
  * Inital state for AppState 
@@ -10,7 +11,7 @@ const initialState  = {
     activeDataset: null,
     viewMode: '2D View',
     viewport: null,
-    loading: { show: false, message: '' }
+    status: new Status()
 };
 
 /**

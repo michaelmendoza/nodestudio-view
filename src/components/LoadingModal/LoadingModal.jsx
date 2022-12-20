@@ -11,15 +11,15 @@ const LoadingModal = () => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        setShowModal(state.loading.show);
-    }, [state.loading])
+        setShowModal(state.status.show);
+    }, [state.status])
 
     return (
         <Modal title='Loading' open={showModal} onClose={() => setShowModal(!showModal)} useClose={false}>
             <div className='loading-modal layout-center'>
                 <LoadingSpinner></LoadingSpinner> 
                 <div className='loading-modal-message'> 
-                    <label> { state.loading?.message } </label>
+                    <label> { state.status?.message } </label>
                 </div>
             </div>
         </Modal>

@@ -6,6 +6,7 @@ import ViewportControls from './ViewportControls';
 import Dataset from '../../state/models/Dataset';
 import ChartBase from '../Charts/ChartBase';
 import ROIViewer from '../Charts/ROIViewer';
+import Status from '../../state/models/Status';
 
 const Viewport = () => {
 
@@ -19,7 +20,7 @@ const Viewport = () => {
     const fetch = async () => {
         if (!state.activeFile) return;
 
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Loading data ...' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Loading data ...' }) });
 
         const dataset = new Dataset(state.activeFile, state.viewport);
         dataset.setViewMode(state.viewMode);
@@ -31,7 +32,7 @@ const Viewport = () => {
             state.viewport.roi = new ROIViewer(state.viewport);
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
 
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
 
     }
 

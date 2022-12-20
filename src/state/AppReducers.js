@@ -36,7 +36,7 @@ export const AppReducers = (state, action) => {
             return { ...state, viewport: action.payload }
 
         case ActionTypes.SET_LOADING_STATUS:
-            return { ...state, loading: action.payload }
+            return { ...state, status: action.payload }
 
         default:
             return state;

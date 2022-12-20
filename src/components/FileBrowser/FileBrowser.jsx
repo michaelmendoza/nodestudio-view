@@ -7,6 +7,7 @@ import FileBrowserItem from './FileBrowserItem';
 import { useAppState } from '../../state/AppState';
 import { ActionTypes } from '../../state';
 import FileNamingModal from './FileNamingModal';
+import Status from '../../state/models/Status';
 
 const FileBrowser = ({onSelect}) => {
     const { dispatch } = useAppState();
@@ -54,14 +55,14 @@ const FileBrowser = ({onSelect}) => {
     }
 
     const loadFile = async () => {
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: true, message: 'Load DataFile ...' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Load DataFile ...'}) });
 
         await APIDataService.addFiles(path, filename);
         let files = await APIDataService.getFiles();
         dispatch({ type:ActionTypes.SET_FILES, files });
         if(onSelect) onSelect();
 
-        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: { show: false, message: '' } });
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({show: false}) });
     }
 
     const handleFileLoad = async () => {
