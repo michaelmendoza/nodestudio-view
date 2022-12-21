@@ -1,13 +1,22 @@
+import { throttle } from '../../libraries/Utils';
 
-const STATE = {
+export const STATE = {
     NONE: 0,
     ZOOM: 1,
     PAN: 2,
+    ROI: 3
 };
+
+const mousestate = { left: STATE.ROI };
+
+export const setMouseState = (state) => {
+    mousestate.left = state;
+}
 
 class ChartControls {
 
-    constructor(camera, domElement) {
+    constructor(viewer, camera, domElement) {
+        this.viewer = viewer;
         this.camera = camera;
         this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
@@ -30,6 +39,7 @@ class ChartControls {
 		this.zoom0 = this.camera.zoom;
 
         this.domElement.addEventListener( 'contextmenu', this.onContextMenu );
+        this.domElement.addEventListener( 'mousedown', this.handleMouseDown );
         this.domElement.addEventListener( 'mouseup', this.handleMouseUp );
         this.domElement.addEventListener( 'mouseleave', this.handleMouseUp );
         this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
@@ -46,11 +56,18 @@ class ChartControls {
 
     onContextMenu = (event) => { 
         event.preventDefault();
-        this.state = STATE.PAN;
+    }
+
+    handleMouseDown = (event) => {
+        if(event.button === 2) return;
+
+        this.state = mousestate.left;
+        if (this.state === STATE.ROI) {
+            throttle(() => this.viewer.roi.updatePixel(this.viewer.pointerPixel), 10, 'ROI-Viewer');
+        }
     }
 
     handleMouseUp = (event) => {
-        console.log('ROI Deactivate');
         this.state = STATE.NONE;
     }
 
@@ -65,6 +82,17 @@ class ChartControls {
             this.camera.position.x -= this.sensitivity * (1 / this.camera.zoom) * event.movementX;
             this.camera.position.y += this.sensitivity * (1 / this.camera.zoom) * event.movementY;
             this.camera.updateProjectionMatrix();
+        }
+        if (this.state === STATE.ROI) {
+            this.viewer.roi.updatePixel(this.viewer.pointerPixel);
+        }
+        if (this.state === STATE.ZOOM) {
+            const dz = this.sensitivity * (event.movementY + event.movementX);
+            if ( dz < 0 ) {
+                this.dollyIn( this.getZoomScale() );
+            } else if ( dz > 0 ) {
+                this.dollyOut( this.getZoomScale() );
+            }
         }
     }
 

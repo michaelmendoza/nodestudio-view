@@ -18,36 +18,12 @@ class ROIViewer {
 
         this.init();
         this.render();
-
-        this.viewer.ref.current.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.viewer.ref.current.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.viewer.ref.current.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.viewer.ref.current.addEventListener('mouseleave', this.handleMouseUp.bind(this));
-        this.viewer.ref.current.addEventListener('pointercancel', this.handleMouseUp.bind(this));
-    }
-
-    handleMouseDown = (event) => {
-        console.log('ROI Activate')
-        if(event.button === 2) return;
-
-        this.mousedown = true;
-        this.updatePixel(this.viewer.pointerPixel);
-    }
-
-    handleMouseMove = (event) => {
-        if (this.mousedown)
-         throttle(() => this.updatePixel(this.viewer.pointerPixel), 10, 'ROI-Viewer');
-    }
-
-    handleMouseUp = (event) => {
-        console.log('ROI Deactivate');
-        this.mousedown = false;
     }
 
     updatePixel = (p) => {
+        console.log('update', p)
         const x = p.x;
         const y = p.y;
-        console.log(x + y * this.shape[1]);
 
         const value = 255;
         const brush = this.brush;
@@ -112,6 +88,11 @@ class ROIViewer {
             this.viewer.scene.add( mesh );
             this.mesh = mesh;            
         }
+    }
+
+    remove = () => {
+        console.log('Remove ROI');
+        this.viewer.scene.remove(this.mesh);
     }
 
     create2DTexture = () => {

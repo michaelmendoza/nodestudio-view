@@ -56,9 +56,14 @@ button {
   color: #FEFEFE;
   background-color: #3e4451;
 
-  &:hover, &:focus, &:active {
+  &:hover {
     color: #FEFEFE;
     background-color: lighten(#3e4451, 20%);
+  }
+
+  &:focus, &:active {
+    color: #FEFEFE;
+    background-color: #3e4451;
   }
 }
 
@@ -73,6 +78,7 @@ button {
     background-color: #efefef;
     border-radius: 50%;
   }
+  
 }
 
 [type=color], [type=date], [type=datetime], [type=datetime-local], [type=email], [type=month], [type=number], [type=password], [type=search], [type=tel], [type=text], [type=url], [type=week], [type=time], select, textarea {

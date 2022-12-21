@@ -1,0 +1,44 @@
+
+.context-menu {
+    position: relative;
+
+    .context-menu-background {
+        position: fixed;
+        top:0;
+        bottom: 0;
+        left:0;
+        right:0;
+        z-index: 100;
+        background-color: #66666666;
+    }
+
+    .context-menu-header {
+        background-color: darken(#3e4451, 4%);
+        border-bottom: 1px solid #55555555;
+        padding: 0.75em 1.25em;
+
+        label {
+            margin: 0;
+            font-weight: 400;
+        }
+    }
+
+    .context-menu-options {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: absolute;
+        border: 1px solid #cdcdcd;
+        z-index: 101;
+
+        button {
+            border-radius: 0;
+            border: none;
+            margin: 0;
+            width: 100%;
+            text-align: left;
+            font-weight: 200;
+        }
+    }
+}

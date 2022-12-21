@@ -45,7 +45,7 @@ class Viewer {
         this.ref.current.appendChild( this.renderer.domElement );
 
         this.pointer = null;
-        this.controls = new ChartControls( this.camera, this.renderer.domElement);
+        this.controls = new ChartControls( this, this.camera, this.renderer.domElement);
     }
 
     animate = () => {

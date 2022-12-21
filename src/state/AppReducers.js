@@ -35,6 +35,7 @@ export const AppReducers = (state, action) => {
         case ActionTypes.SET_VIEWPORT:
             return { ...state, viewport: action.payload }
 
+        // Status
         case ActionTypes.SET_LOADING_STATUS:
             return { ...state, status: action.payload }
 

@@ -1,21 +1,36 @@
 import './Viewport.scss';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppState, ActionTypes } from '../../state';
 import { debounce, throttle } from '../../libraries/Utils';
 import ViewportControls from './ViewportControls';
 import Dataset from '../../state/models/Dataset';
-import ChartBase from '../Charts/ChartBase';
 import ROIViewer from '../Charts/ROIViewer';
 import Status from '../../state/models/Status';
+import Viewer from '../../state/models/Viewer';
+import ContextMenu from '../ContextMenu/ContextMenu';
 
 const Viewport = () => {
 
     const { state, dispatch } = useAppState();
+    const isInit = useRef(false);
+    const ref = useRef();
+
+    useEffect(()=>{
+        if(isInit.current) return;
+        init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect( () => {
         debounce(fetch, 100, 'Viewport-LoadFile');
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.activeFile, state.viewMode])
+
+    const init = () => {
+        const viewer = new Viewer(ref, dispatch);
+        isInit.current = true;
+        dispatch({ type: ActionTypes.SET_VIEWPORT, payload: viewer });
+    }
 
     const fetch = async () => {
         if (!state.activeFile) return;
@@ -28,8 +43,10 @@ const Viewport = () => {
         await dataset.fetchDataset();
         dataset.render()
 
-        if(!state.viewport.roi)        
-            state.viewport.roi = new ROIViewer(state.viewport);
+        if(state.viewport.roi)
+            state.viewport.roi.remove();
+        state.viewport.roi = new ROIViewer(state.viewport);
+        
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
 
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
@@ -59,9 +76,17 @@ const Viewport = () => {
         }
     }
 
+    const height = (window.innerHeight - 100).toString() + 'px'; 
     return (
         <div className='viewport' tabIndex="0" onKeyDown={handleKeyDown}> 
-            <ChartBase></ChartBase>
+            <ContextMenu domElement={ref.current}></ContextMenu>
+
+            <div>
+                <div className='webgl-viewport' style={{width:'100%', height:height}} ref={ref}>
+                </div>
+                { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
+            </div>           
+
             { state.viewMode === '2D View' ? <ViewportControls onUpdate={handleIndexUpdate}></ViewportControls> : null }
         </div>
     )

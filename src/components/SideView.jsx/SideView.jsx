@@ -9,12 +9,10 @@ import FileDataInfo from '../FileDataInfo/FileDataInfo';
 
 const SideView = () => {
     return ( <div className="sideview">
-        <Tabs tabnames={['Load', 'Files', 'Inspect']}>
-                <FileBrowser></FileBrowser>
+        <Tabs tabnames={[ 'Files', 'Inspect']}>
                 <FilesView></FilesView>
                 <FileDataInfo></FileDataInfo>
         </Tabs>
-        
     </div>
     )
 }
@@ -23,7 +21,7 @@ const FilesView  = () => {
     const [showFileBroswer, setShowFileBroswer] = useState(false);
 
     return(<div>
-        <button onClick={() => setShowFileBroswer(!showFileBroswer)}> { showFileBroswer ? 'Back' : 'Load New File' }</button>
+        <button className='button-dark' onClick={() => setShowFileBroswer(!showFileBroswer)}> { showFileBroswer ? 'Back' : 'Load New File' }</button>
         <Divider></Divider>
         { showFileBroswer ? <FileBrowser></FileBrowser> : <FileDataList></FileDataList> }
     </div>)
