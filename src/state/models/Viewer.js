@@ -84,8 +84,12 @@ class Viewer {
 
         let pointerUV = null;
         for ( let i = 0; i < intersects.length; i ++ ) {
-            if(intersects[i].uv)
+            if(intersects[i].uv) {
                 pointerUV = intersects[i].uv
+
+                if (intersects[i]?.object?.name === 'roi') 
+                    this.pointerTargetROI = intersects[i].object
+            }
         }
 
         if (!pointerUV) return;

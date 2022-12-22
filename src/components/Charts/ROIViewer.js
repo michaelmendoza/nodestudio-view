@@ -11,6 +11,7 @@ class ROIViewer {
         this.viewer = viewer;
         this.roi = null;
         this.mesh = null;
+        this.mesh_lightbox = {};
         this.shape  = null; 
         this.useBrush = true; // Is brush or eraser 
         this.brush = 5;
@@ -29,11 +30,15 @@ class ROIViewer {
         const x = p.x;
         const y = p.y;
 
+        let depth;
+        if(this.viewer.dataset.viewMode === '2D View') depth = this.getDepth();
+        if(this.viewer.dataset.viewMode === 'Lightbox') depth = this.viewer.pointerTargetROI.depth;
+
         const value = 255;
         const brush = this.brush;
         const height = this.shape[0];
         const width = this.shape[1];
-        const dz = height * width * this.getDepth();
+        const dz = height * width * depth;
 
         if(brush === 1) {
             this.roi[p.x + width * p.y + dz] = this.useBrush ? value : 0;
@@ -55,7 +60,12 @@ class ROIViewer {
         }
 
         const texture = this.create2DTexture();
-        this.mesh.material.uniforms[ "diffuse" ].value = texture;
+        if(this.viewer.dataset.viewMode === '2D View') {
+            this.mesh.material.uniforms[ "diffuse" ].value = texture;
+        }
+        if(this.viewer.dataset.viewMode === 'Lightbox') {
+            this.mesh_lightbox[depth].material.uniforms[ "depth" ].value = depth;
+        }
     }
 
     init = () => {
@@ -75,9 +85,16 @@ class ROIViewer {
         // Initalize ROI layer        
         const length = this.shape[0] * this.shape[1] * this.shape[2]; 
         this.roi = new Uint8Array(length);
+
+
     }
 
     render = () => {
+        if(this.viewer.dataset.viewMode === '2D View') this.render2D();
+        if(this.viewer.dataset.viewMode === 'Lightbox') this.renderLightbox();
+    }
+
+    render2D = () => {
         const texture = this.create2DTexture()
     
         if (this.mesh) {
@@ -87,9 +104,42 @@ class ROIViewer {
             const material = this.createMaterial(texture);
             const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
             const mesh = new THREE.Mesh( geometry, material );
-    
+            mesh.name = 'roi';
+
             this.viewer.scene.add( mesh );
             this.mesh = mesh;            
+        }
+    }
+
+    renderSlice = (planeWidth, planeHeight, planeOffset, index) => {
+        const texture = this.create2DTexture();
+    
+        if (this.mesh_lightbox[index]) {
+            this.mesh_lightbox[index].material.uniforms[ "diffuse" ].value = texture;
+        }
+        else {
+            const material = this.createMaterial(texture, planeWidth, planeHeight, index);
+            const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+            const mesh = new THREE.Mesh( geometry, material );
+            mesh.position.x = planeOffset.x;
+            mesh.position.y = planeOffset.y;
+            mesh.name = `roi`
+            mesh.depth = index;
+
+            this.viewer.scene.add( mesh );
+            this.mesh_lightbox[index] = mesh;            
+        }
+    }
+
+    renderLightbox = () => {
+        const length = this.shape[2]; // Depth
+        const factor =  Math.ceil(Math.sqrt(length));
+        const width = 100 / factor;
+        const height = 100 / factor;
+
+        for(var i = 0; i < length; i++) {
+            const offset = { x: width * (i % factor) - (100 - width) / 2, y: height * Math.floor(i / factor) - (100 - height) / 2 }
+            this.renderSlice(width, height, offset, i);
         }
     }
 
@@ -107,9 +157,7 @@ class ROIViewer {
         return texture;
     }
 
-    createMaterial = (texture) => {
-
-        const depth = this.viewer.dataset.indices[0];
+    createMaterial = (texture, planeWidth = 100, planeHeight = 100, depth = this.viewer.dataset.indices[0]) => {
 
         const material = new THREE.ShaderMaterial( {
             uniforms: {

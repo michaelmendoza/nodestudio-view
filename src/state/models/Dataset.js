@@ -152,7 +152,7 @@ class Dataset {
         }
 
         const length = dataset.shape[0]; //4;
-        const factor =  Math.ceil(Math.sqrt(dataset.shape[0]));
+        const factor =  Math.ceil(Math.sqrt(length));
         const width = 100 / factor;
         const height = 100 / factor;
 
