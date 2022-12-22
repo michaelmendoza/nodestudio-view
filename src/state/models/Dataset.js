@@ -115,10 +115,16 @@ class Dataset {
         if (!this.viewport) return;
         console.log('renderUpdate 2D')
 
+        // Clear Mesh from Lightbox 
+        if(this.viewport.mesh_lightbox) {
+            Object.values(this.viewport.mesh_lightbox).forEach((mesh) => this.viewport.scene.remove(mesh));
+            this.viewport.mesh_lightbox = null;
+        }
+
         const texture = this.create2DTexture()
 
-        if (this.viewport.mesh) {
-            this.viewport.mesh.material.uniforms[ "diffuse" ].value = texture;
+        if (this.viewport.mesh_2D) {
+            this.viewport.mesh_2D.material.uniforms[ "diffuse" ].value = texture;
         }
         else {
             const planeWidth = 100
@@ -127,16 +133,23 @@ class Dataset {
             const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
             const mesh = new THREE.Mesh( geometry, material );
     
-            this.viewport.scene.add( mesh );
-            this.viewport.mesh = mesh;            
+            this.viewport.scene.add( mesh );    
+            this.viewport.mesh_2D = mesh;      
         }
     }
 
     renderDataset = async () => {
         if (!this.viewport) return;
-
         const viewport = this.viewport;
         const dataset = this.dataset;
+
+        if(!this.viewport.mesh_lightbox) this.viewport.mesh_lightbox = {};
+
+        // Clear Mesh from 2D Render  
+        if(this.viewport.mesh_2D) {
+            this.viewport.scene.remove(this.viewport.mesh_2D)
+            this.viewport.mesh_2D = null;
+        }
 
         const length = dataset.shape[0]; //4;
         const factor =  Math.ceil(Math.sqrt(dataset.shape[0]));
@@ -150,11 +163,12 @@ class Dataset {
             const _dataset = { };
             _dataset.shape = [dataset.shape[1], dataset.shape[2], 1];
             _dataset.data = dataset.data.slice( _length * i, _length * (i+1)); 
-            this.renderDataslice(_dataset, viewport, width, height, offset);
+
+            this.renderDataslice(_dataset, viewport, width, height, offset, i);
         }
     }
 
-    renderDataslice = async (dataset, viewport, width, height, offset) => {
+    renderDataslice = async (dataset, viewport, width, height, offset, meshIndex) => {
         console.log('renderUpdate dataslice')
 
         const data = dataset.data;
@@ -171,24 +185,30 @@ class Dataset {
         texture.format = THREE.RedFormat;
         texture.needsUpdate = true;
 
-        const material = new THREE.ShaderMaterial( {
-            uniforms: {
-                diffuse: { value: texture },
-                depth: { value: 0 },
-                size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
-            },
-            vertexShader: VertexShader,
-            fragmentShader: FragmentShader,
-            glslVersion: THREE.GLSL3
-        } );
-
-        const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
-
-        const mesh = new THREE.Mesh( geometry, material );
-        mesh.position.x = offset.x;
-        mesh.position.y = offset.y;
-
-        viewport.scene.add( mesh );
+        if(this.viewport.mesh_lightbox[meshIndex]) {
+            this.viewport.mesh_lightbox[meshIndex].material.uniforms[ "diffuse" ].value = texture;
+        }
+        else {
+            const material = new THREE.ShaderMaterial( {
+                uniforms: {
+                    diffuse: { value: texture },
+                    depth: { value: 0 },
+                    size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+                },
+                vertexShader: VertexShader,
+                fragmentShader: FragmentShader,
+                glslVersion: THREE.GLSL3
+            } );
+    
+            const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+    
+            const mesh = new THREE.Mesh( geometry, material );
+            mesh.position.x = offset.x;
+            mesh.position.y = offset.y;
+    
+            viewport.scene.add( mesh );
+            this.viewport.mesh_lightbox[meshIndex] = mesh;
+        }
     }
 
 }

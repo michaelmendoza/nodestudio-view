@@ -16,6 +16,10 @@ class ROIViewer {
         this.brush = 5;
         this.mousedown = false;
 
+        // Clean up previous ROI mesh in scene 
+        if(viewer.roi)
+            viewer.roi.remove();
+
         this.init();
         this.render();
     }
@@ -80,7 +84,6 @@ class ROIViewer {
             this.mesh.material.uniforms[ "diffuse" ].value = texture;
         }
         else {
-
             const material = this.createMaterial(texture);
             const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
             const mesh = new THREE.Mesh( geometry, material );

@@ -43,8 +43,6 @@ const Viewport = () => {
         await dataset.fetchDataset();
         dataset.render()
 
-        if(state.viewport.roi)
-            state.viewport.roi.remove();
         state.viewport.roi = new ROIViewer(state.viewport);
         
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });

@@ -14,6 +14,8 @@ class Viewer {
 
         this.dataset = null;
         this.mesh = null;
+        this.mesh_2D = null;
+        this.mesh_lightbox = null;
         this.roi = null;
 
         this.init();
