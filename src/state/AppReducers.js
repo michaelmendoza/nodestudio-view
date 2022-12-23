@@ -5,6 +5,7 @@ export const ActionTypes = {
     'NONE': count(),
     'SET_FILES': count(),
     'SET_ACTIVE_FILE': count(),
+    'UPDATE_DATASETS': count(),
     'SET_ACTIVE_DATASET': count(),
     'SET_VIEW_MODE': count(),
     'SET_VIEWPORT': count(),
@@ -22,6 +23,11 @@ export const AppReducers = (state, action) => {
         // ActiveFile
         case ActionTypes.SET_ACTIVE_FILE:
             return { ...state, activeFile: action.payload }
+
+        // Datasets
+        case ActionTypes.UPDATE_DATASETS:
+            const dataset = action.payload;
+            return { ...state, datasets: { ...state.datasets, [dataset.file.id]:dataset }}
 
         // Active Dataset 
         case ActionTypes.SET_ACTIVE_DATASET:

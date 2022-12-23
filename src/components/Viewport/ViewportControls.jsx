@@ -15,8 +15,7 @@ const ViewportControls = ({ onUpdate }) => {
     const handleIndexUpdate = (index, value) => {
         console.log(index, value);
         state.activeDataset.updateIndex(index, value);
-        if (index === 0)
-            state.viewport?.roi?.setDepth(value);
+        state.activeDataset.roi.setDepth(value);
         onUpdate();
     }
 

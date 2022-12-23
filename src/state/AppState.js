@@ -8,6 +8,7 @@ import Status from './models/Status';
 const initialState  = { 
     files: [],
     activeFile: null,
+    datasets: {},
     activeDataset: null,
     viewMode: '2D View',
     viewport: null,

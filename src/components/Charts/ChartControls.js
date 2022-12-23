@@ -63,7 +63,7 @@ class ChartControls {
 
         this.state = mousestate.left;
         if (this.state === STATE.ROI) {
-            throttle(() => this.viewer.roi.updatePixel(this.viewer.pointerPixel), 10, 'ROI-Viewer');
+            throttle(() => this.viewer.dataset.roi.updatePixel(this.viewer.pointerPixel), 10, 'ROI-Viewer');
         }
     }
 
@@ -84,7 +84,7 @@ class ChartControls {
             this.camera.updateProjectionMatrix();
         }
         if (this.state === STATE.ROI) {
-            this.viewer.roi.updatePixel(this.viewer.pointerPixel);
+            this.viewer.dataset.roi.updatePixel(this.viewer.pointerPixel);
         }
         if (this.state === STATE.ZOOM) {
             const dz = this.sensitivity * (event.movementY + event.movementX);

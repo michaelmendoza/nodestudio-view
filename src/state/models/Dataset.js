@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { Chart2D_FragmentShader, Chart2D_VertexShader } from "../../components/Charts/ChartShaders";
 import { throttle } from "../../libraries/Utils";
 import Contrast from './Contrast';
+import ROIViewer from "../../components/Charts/ROIViewer";
 
 
 class Dataset {
@@ -16,7 +17,7 @@ class Dataset {
 
         this.file = file;
         this.metadata = null;
-        this.dataset = null;
+        this.dataset = null; // TODO: Refactor to dataslice 
         this.viewMode = '2D View';
 
         this.indices = [0,0,0];
@@ -26,6 +27,25 @@ class Dataset {
         this.update = 0;
 
         this.contrast = new Contrast();
+        this.roi = null;
+    }
+
+    init = async (viewMode) => {
+        // Initalize dataset with data and metadata
+        this.setViewMode(viewMode);
+        await this.fetchMetadata();
+        await this.fetchDataset();
+        this.render();
+
+        // Initialize ROI 
+        if (this.roi === null) { 
+            this.roi = new ROIViewer(this.viewport, this);
+        }
+        else {
+            this.roi.reset();
+            this.roi.render();
+            this.roi.setDepth(this.indices[0]);
+        }
     }
 
     setViewMode = (viewMode) => {

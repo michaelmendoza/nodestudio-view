@@ -13,10 +13,8 @@ class Viewer {
         this.dispatch = dispatch;
 
         this.dataset = null;
-        this.mesh = null;
         this.mesh_2D = null;
         this.mesh_lightbox = null;
-        this.roi = null;
 
         this.init();
 
@@ -50,6 +48,12 @@ class Viewer {
         this.controls = new ChartControls( this, this.camera, this.renderer.domElement);
     }
 
+    cleanupROIMeshes = () => {
+        this.scene.children.forEach((child) => {
+            if ( child.name === 'roi') this.scene.remove(child);
+        })
+    }
+
     animate = () => {
         requestAnimationFrame( this.animate );
         this.raycast();
@@ -76,6 +80,7 @@ class Viewer {
     raycast = () => {
         if (!this.pointer) return;
         if (!this.dataset) return;
+        if (!this.dataset?.dataset?.shape) return
 
         raycaster.setFromCamera( this.pointer, this.camera );
         // calculate objects intersecting the picking ray

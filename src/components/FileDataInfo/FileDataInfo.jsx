@@ -96,18 +96,18 @@ const ROIControls = () => {
     const [brushSize, setBrushSize] = useState(5);
 
     const updateBrushType = (mode) => {
-        state.viewport.roi.useBrush = mode === 'Brush';
+        state.viewport.dataset.roi.useBrush = mode === 'Brush';
         setBrushType(mode)
     }
 
     const updateBrushSize = (value) => {
-        state.viewport.roi.brush = value;
+        state.viewport.dataset.roi.brush = value;
         setBrushSize(value);
     }
 
     const exportROIData = async () => {
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Exporting ROI Masks ...' }) });
-        const data = await state.viewport.roi.export();
+        const data = await state.viewport.dataset.roi.export();
         await APIDataService.exportROIData(data.data, data.shape);
         APIDataService.exportDownload();
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false, message: '' }) });

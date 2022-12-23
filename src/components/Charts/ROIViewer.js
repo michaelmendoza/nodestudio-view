@@ -7,8 +7,9 @@ const planeWidth = 100;
 const planeHeight = 100;
 
 class ROIViewer {
-    constructor(viewer) {
+    constructor(viewer, dataset) {
         this.viewer = viewer;
+        this.dataset = dataset;
         this.roi = null;
         this.mesh = null;
         this.mesh_lightbox = {};
@@ -18,8 +19,8 @@ class ROIViewer {
         this.mousedown = false;
 
         // Clean up previous ROI mesh in scene 
-        if(viewer.roi)
-            viewer.roi.remove();
+        if(viewer.dataset.roi)
+            viewer.dataset.roi.remove();
 
         this.init();
         this.render();
@@ -60,17 +61,17 @@ class ROIViewer {
         }
 
         const texture = this.create2DTexture();
-        if(this.viewer.dataset.viewMode === '2D View') {
+        if(this.dataset.viewMode === '2D View') {
             this.mesh.material.uniforms[ "diffuse" ].value = texture;
         }
-        if(this.viewer.dataset.viewMode === 'Lightbox') {
+        if(this.dataset.viewMode === 'Lightbox') {
             this.mesh_lightbox[depth].material.uniforms[ "depth" ].value = depth;
         }
     }
 
     init = () => {
         // Note: Dataset shape -> [depth, height, width] and ROI texture needs -> [hieght, width, depth]
-        const shape = this.viewer.dataset.metadata.shape; // i.e. [160, 640, 640]
+        const shape = this.dataset.metadata.shape; // i.e. [160, 640, 640]
         this.shape = [...shape];
 
         if(shape[2] === undefined)  {
@@ -85,13 +86,16 @@ class ROIViewer {
         // Initalize ROI layer        
         const length = this.shape[0] * this.shape[1] * this.shape[2]; 
         this.roi = new Uint8Array(length);
-
-
     }
 
     render = () => {
-        if(this.viewer.dataset.viewMode === '2D View') this.render2D();
-        if(this.viewer.dataset.viewMode === 'Lightbox') this.renderLightbox();
+        if(this.dataset.viewMode === '2D View') this.render2D();
+        if(this.dataset.viewMode === 'Lightbox') this.renderLightbox();
+    }
+
+    reset = () => {
+        this.mesh = null;
+        this.mesh_lightbox = {};
     }
 
     render2D = () => {
@@ -174,9 +178,7 @@ class ROIViewer {
     }
 
     getDepth = () => {
-        if(!this?.mesh?.material?.uniforms[ "depth" ])
-            return 0;
-        return this.mesh.material.uniforms[ "depth" ].value
+        return this.dataset.indices[0];
     }
 
     setDepth = (depth) => {

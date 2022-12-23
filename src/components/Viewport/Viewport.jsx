@@ -37,18 +37,24 @@ const Viewport = () => {
 
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Loading data ...' }) });
 
-        const dataset = new Dataset(state.activeFile, state.viewport);
-        dataset.setViewMode(state.viewMode);
-        await dataset.fetchMetadata();
-        await dataset.fetchDataset();
-        dataset.render()
-
-        state.viewport.roi = new ROIViewer(state.viewport);
+        state.viewport.cleanupROIMeshes();
         
+        let dataset;
+        if (state.datasets[state.activeFile.id]) {
+            // Reload dataset and render
+            dataset = state.datasets[state.activeFile.id];
+            await dataset.init(state.viewMode);
+        }
+        else {
+            // Create a new dataset and render 
+            dataset = new Dataset(state.activeFile, state.viewport);
+            await dataset.init(state.viewMode);
+        }
+
+
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
-
+        dispatch({ type: ActionTypes.UPDATE_DATASETS, payload: dataset });
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
-
     }
 
     const fetchData = async () => {
