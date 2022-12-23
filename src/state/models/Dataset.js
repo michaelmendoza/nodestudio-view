@@ -45,7 +45,6 @@ class Dataset {
         else {
             this.roi.reset();
             this.roi.render();
-            this.roi.setDepth(this.indices[0]);
         }
     }
 

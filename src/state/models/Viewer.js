@@ -99,14 +99,17 @@ class Viewer {
 
         if (!pointerUV) return;
 
+        const sizeX = this.dataset.metadata.shape[2];
+        const sizeY = this.dataset.metadata.shape[1];
+ 
         let pointerPixel = new THREE.Vector2();
-        pointerPixel.x = pointerUV.x * this.dataset.dataset.shape[1];
-        pointerPixel.y = pointerUV.y * this.dataset.dataset.shape[0];
+        pointerPixel.x = pointerUV.x * sizeX;
+        pointerPixel.y = pointerUV.y * sizeY;
 
         this.pointerUV = pointerUV;
         this.pointerPixel = pointerPixel;
         this.pointerPixel.x = Math.floor(pointerPixel.x);
-        this.pointerPixel.y = this.dataset.dataset.shape[0] - Math.floor(pointerPixel.y) - 1; 
+        this.pointerPixel.y = sizeY - Math.floor(pointerPixel.y) - 1; 
 
         if (this.dispatch)
             this.dispatch({ type: ActionTypes.SET_VIEWPORT, payload: this });

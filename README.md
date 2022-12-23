@@ -6,7 +6,7 @@ A simple dicom/raw data viewer with ROI/Segmenation tools
 
 * [x] Ability to switch between 2D and Lightbox modes 
 * [x] ROI Persisiece between data switch
-* [ ] ROI for Lightbox mode 
+* [x] ROI for Lightbox mode 
 * [ ] Import ROI data
 * [ ] Depth -> Multidimenstional includes all dims 
 * [ ] Lightbox for raw data 

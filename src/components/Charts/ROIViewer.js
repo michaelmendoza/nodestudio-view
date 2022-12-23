@@ -65,6 +65,7 @@ class ROIViewer {
             this.mesh.material.uniforms[ "diffuse" ].value = texture;
         }
         if(this.dataset.viewMode === 'Lightbox') {
+            this.mesh_lightbox[depth].material.uniforms[ "diffuse" ].value = texture;
             this.mesh_lightbox[depth].material.uniforms[ "depth" ].value = depth;
         }
     }
@@ -102,6 +103,7 @@ class ROIViewer {
         const texture = this.create2DTexture()
     
         if (this.mesh) {
+            this.setDepth(this.dataset.indices[0]);
             this.mesh.material.uniforms[ "diffuse" ].value = texture;
         }
         else {
@@ -115,9 +117,21 @@ class ROIViewer {
         }
     }
 
-    renderSlice = (planeWidth, planeHeight, planeOffset, index) => {
+    renderLightbox = () => {
+        const length = this.shape[2]; // Depth
+        const factor =  Math.ceil(Math.sqrt(length));
+        const width = 100 / factor;
+        const height = 100 / factor;
+
         const texture = this.create2DTexture();
-    
+
+        for(var i = 0; i < length; i++) {
+            const offset = { x: width * (i % factor) - (100 - width) / 2, y: height * Math.floor(i / factor) - (100 - height) / 2 }
+            this.renderSlice(texture, width, height, offset, i);
+        }
+    }
+
+    renderSlice = (texture, planeWidth, planeHeight, planeOffset, index) => {    
         if (this.mesh_lightbox[index]) {
             this.mesh_lightbox[index].material.uniforms[ "diffuse" ].value = texture;
         }
@@ -132,18 +146,6 @@ class ROIViewer {
 
             this.viewer.scene.add( mesh );
             this.mesh_lightbox[index] = mesh;            
-        }
-    }
-
-    renderLightbox = () => {
-        const length = this.shape[2]; // Depth
-        const factor =  Math.ceil(Math.sqrt(length));
-        const width = 100 / factor;
-        const height = 100 / factor;
-
-        for(var i = 0; i < length; i++) {
-            const offset = { x: width * (i % factor) - (100 - width) / 2, y: height * Math.floor(i / factor) - (100 - height) / 2 }
-            this.renderSlice(width, height, offset, i);
         }
     }
 
