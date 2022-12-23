@@ -66,7 +66,7 @@ class Viewer {
         const max_value = this.dataset.maxIndices[index];
         const inc_value = value + 1 > max_value ? max_value : value + 1;
         this.dataset.updateIndex(index, inc_value);
-        this.roi.setDepth(inc_value);
+        this.dataset.roi.setDepth(inc_value);
     }
 
     decrement_index = (index = 0) => {
@@ -74,7 +74,7 @@ class Viewer {
         const value = this.dataset.indices[index];
         const dec_value = value - 1 < 0 ? 0 : value - 1;
         this.dataset.updateIndex(index, dec_value);
-        this.roi.setDepth(dec_value);
+        this.dataset.roi.setDepth(dec_value);
     }
 
     raycast = () => {

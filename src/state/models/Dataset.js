@@ -13,7 +13,6 @@ class Dataset {
 
     constructor(file, viewport) {
         this.viewport = viewport;
-        this.viewport.dataset = this;
 
         this.file = file;
         this.metadata = null;
@@ -31,6 +30,8 @@ class Dataset {
     }
 
     init = async (viewMode) => {
+        this.viewport.dataset = this;
+
         // Initalize dataset with data and metadata
         this.setViewMode(viewMode);
         await this.fetchMetadata();
