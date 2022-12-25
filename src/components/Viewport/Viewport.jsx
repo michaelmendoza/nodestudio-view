@@ -36,8 +36,6 @@ const Viewport = () => {
         if (!state.activeFile) return;
 
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Loading data ...' }) });
-
-        state.viewport.cleanupROIMeshes();
         
         let dataset;
         if (state.datasets[state.activeFile.id]) {
@@ -50,7 +48,6 @@ const Viewport = () => {
             dataset = new Dataset(state.activeFile, state.viewport);
             await dataset.init(state.viewMode);
         }
-
 
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
         dispatch({ type: ActionTypes.UPDATE_DATASETS, payload: dataset });

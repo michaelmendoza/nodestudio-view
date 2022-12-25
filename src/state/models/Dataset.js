@@ -23,6 +23,7 @@ class Dataset {
         this.maxIndices = [1,1,1];
 
         this.key = '[0,:,:]';
+        this.dims = "['Sli','Lin','Col']";
         this.update = 0;
 
         this.contrast = new Contrast();
@@ -70,12 +71,16 @@ class Dataset {
 
     /** Fetches Dataset from API */
     fetchDataset = async () => {
-        if (this.viewMode === 'Lightbox')
-            this.key = generateKeyFromIndices(this.metadata.shape, this.indices, [0,1,2]);
-        else
+        if (this.viewMode === 'Lightbox') {
+            this.key = generateKeyFromIndices(this.metadata.shape, this.indices, [0,1,2]);      
+            this.dims = "['Lin','Col','Sli']"; 
+        }
+        else { // 2D View
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices);
+            this.dims = "['Sli','Lin','Col']";
+        }
         
-        let data = await APIDataService.getFileData(this.file.id, this.key);
+        let data = await APIDataService.getFileData(this.file.id, this.key, this.dims);
         if (data.isEncoded) {
             data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
         } 
@@ -87,7 +92,7 @@ class Dataset {
 
     render = () => {
         if(this.viewMode === '2D View') this.render2D();
-        if(this.viewMode === 'Lightbox') this.renderDataset();
+        if(this.viewMode === 'Lightbox') this.renderLightbox();
     }
 
     updateRender = async () => {
@@ -99,9 +104,7 @@ class Dataset {
         throttle(() => _render(), 50, 'Dataset-Update');
     }
 
-    create2DTexture = () => {
-        const data = this.dataset.data;
-        const shape = this.dataset.shape;
+    create2DTexture = (data = this.dataset.data, shape = this.dataset.shape) => {
         if(shape[2] === undefined) shape[2] = 1;
 
         const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2] );
@@ -137,7 +140,9 @@ class Dataset {
 
         // Clear Mesh from Lightbox 
         if(this.viewport.mesh_lightbox) {
-            Object.values(this.viewport.mesh_lightbox).forEach((mesh) => this.viewport.scene.remove(mesh));
+            Object.values(this.viewport.mesh_lightbox).forEach((mesh) => { 
+                this.viewport.scene.remove(mesh)
+            });
             this.viewport.mesh_lightbox = null;
         }
 
@@ -158,7 +163,7 @@ class Dataset {
         }
     }
 
-    renderDataset = async () => {
+    renderLightbox = async () => {
         if (!this.viewport) return;
         const viewport = this.viewport;
         const dataset = this.dataset;
@@ -171,39 +176,39 @@ class Dataset {
             this.viewport.mesh_2D = null;
         }
 
-        const length = dataset.shape[0]; //4;
+        const length = dataset.shape[0]; //dataset.shape[0]; //4;
         const factor =  Math.ceil(Math.sqrt(length));
         const width = 100 / factor;
         const height = 100 / factor;
 
+        const shape = [...this.dataset.shape]
+        shape[0] = this.dataset.shape[1];
+        shape[1] = this.dataset.shape[2];
+        shape[2] = this.dataset.shape[0];
+        const texture = this.create2DTexture(this.dataset.data, shape);
+
         for(var i = 0; i < length; i++) {
             const offset = { x: width * (i % factor) - (100 - width) / 2, y: height * Math.floor(i / factor) - (100 - height) / 2 }
-            const _length = dataset.shape[1] * dataset.shape[2];
-            
-            const _dataset = { };
-            _dataset.shape = [dataset.shape[1], dataset.shape[2], 1];
-            _dataset.data = dataset.data.slice( _length * i, _length * (i+1)); 
 
-            this.renderDataslice(_dataset, viewport, width, height, offset, i);
+            //const _length = dataset.shape[1] * dataset.shape[2];
+            const _dataset = { };
+            //_dataset.shape = [dataset.shape[1], dataset.shape[2], 1];
+            //_dataset.data = dataset.data.slice( _length * i, _length * (i+1)); 
+
+            this.renderSlice(texture, _dataset, viewport, width, height, offset, i);
         }
     }
 
-    renderDataslice = async (dataset, viewport, width, height, offset, meshIndex) => {
+    renderSlice = async (texture, dataset, viewport, width, height, offset, meshIndex) => {
         console.log('renderUpdate dataslice')
-
-        const data = dataset.data;
-        const shape = dataset.shape
-        if(shape[2] === undefined) shape[2] = 1;
+        
+        //texture = this.create2DTexture(dataset.data, dataset.shape);
 
         const VertexShader = Chart2D_VertexShader;
         const FragmentShader = Chart2D_FragmentShader;
 
         const planeWidth = width; //50
         const planeHeight = height; //50;
-
-        const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2] );
-        texture.format = THREE.RedFormat;
-        texture.needsUpdate = true;
 
         if(this.viewport.mesh_lightbox[meshIndex]) {
             this.viewport.mesh_lightbox[meshIndex].material.uniforms[ "diffuse" ].value = texture;
@@ -212,7 +217,7 @@ class Dataset {
             const material = new THREE.ShaderMaterial( {
                 uniforms: {
                     diffuse: { value: texture },
-                    depth: { value: 0 },
+                    depth: { value: meshIndex },
                     size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
                 },
                 vertexShader: VertexShader,

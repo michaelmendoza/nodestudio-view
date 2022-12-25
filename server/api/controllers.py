@@ -37,18 +37,27 @@ def encode_data(data, min, max, dtype='uint16'):
 
     return encodedData, dtype, _min, _max
 
-def get_data(fileid, key, encode = True):
+def get_data(fileid, key, encode = True, dims = ['Sli','Lin','Col']):
+    # Retrive data
     dataset = io.get_filedata(fileid)
     data = dataset['data']
+
+    # Reshape data if dims requires
+    dataset_dims = dataset['dims']
+    dims = eval(dims)
+
+    # Slice data and reorganize array to encoding
     data = eval(f'data{key}')
     data = np.ascontiguousarray(data)
     shape = data.shape
 
+    # Take mag of complex data
     isComplex= False
     if np.iscomplexobj(data):
         data = np.abs(data)
         isComplex = True
 
+    # Encode data and generate basic statistics
     if (encode):
         data, dtype, min, max = encode_data(data, dataset['min'], dataset['max'])
     else:
@@ -57,7 +66,7 @@ def get_data(fileid, key, encode = True):
         min = dataset['min']
         max = dataset['max']
     
-    return  { 'data': data, 'shape': shape, 'min':min, 'max':max, 'dtype': dtype, 'isComplex': isComplex, 'isEncoded': encode }
+    return  { 'data': data, 'shape': shape, 'dims': dataset_dims, 'min':min, 'max':max, 'dtype': dtype, 'isComplex': isComplex, 'isEncoded': encode }
 
 def get_metadata(fileid):
     dataset = io.get_filedata(fileid)

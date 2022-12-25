@@ -48,12 +48,6 @@ class Viewer {
         this.controls = new ChartControls( this, this.camera, this.renderer.domElement);
     }
 
-    cleanupROIMeshes = () => {
-        this.scene.children.forEach((child) => {
-            if ( child.name === 'roi') this.scene.remove(child);
-        })
-    }
-
     animate = () => {
         requestAnimationFrame( this.animate );
         this.raycast();

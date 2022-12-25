@@ -41,9 +41,9 @@ async def read_file(filepath: str, filename: str = ''):
 
 @router.get("/files/data")
 @handle_exception
-async def get_data(id: str, key: str, encode: Boolean):
+async def get_data(id: str, key: str, encode: Boolean, dims: str):
     ''' Gets data for given id '''
-    data = controllers.get_data(id, key, encode)
+    data = controllers.get_data(id, key, encode, dims)
     return { 'message': 'Retrieved data', 'data': data }
 
 @router.get("/files/metadata")

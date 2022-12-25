@@ -95,8 +95,17 @@ class ROIViewer {
     }
 
     reset = () => {
-        this.mesh = null;
-        this.mesh_lightbox = {};
+        if (this.mesh) {
+            this.viewer.scene.remove(this.mesh);
+            this.mesh = null;
+        }
+
+        if(this.mesh_lightbox) {
+            Object.values(this.mesh_lightbox).forEach((mesh) => { 
+                this.viewer.scene.remove(mesh)
+            });
+            this.mesh_lightbox = {};
+        }
     }
 
     render2D = () => {
