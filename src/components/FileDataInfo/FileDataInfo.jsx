@@ -8,13 +8,17 @@ import Slider from '../Slider/Slider';
 import { useState } from 'react';
 import APIDataService from '../../services/APIDataService';
 import Status from '../../state/models/Status';
+import { ViewDict } from '../../state/models/Viewer';
+import { ROIOptions, updateUseBrush, updateBrushSize } from '../../state/models/ROI';
+import { render, updateRender } from '../../libraries/DataRenderer';
+import { renderROI } from '../../libraries/ROIRenderer';
 
 const FileDataInfo = () => {
     const { state } = useAppState();
 
     return (<div className='file-data-info'>
         <FileMetadataInspector></FileMetadataInspector>
-        { state.activeDataset ? <ContrastOptions></ContrastOptions> : null }
+        { state.activeDataset && state.viewMode !== 'Lightbox' ? <ContrastOptions></ContrastOptions> : null }
         <ViewerOptions></ViewerOptions>
         <ROIControls></ROIControls>
     </div>)
@@ -23,14 +27,22 @@ const FileDataInfo = () => {
 const ContrastOptions = () => {
     const { state } = useAppState();
 
-    const updateContrastLevel = (value) => {
-        state.activeDataset.contrast.level = value;
-        state.activeDataset.updateRender();
+    const updateRender = async () => {
+        await state.activeDataset.fetchDataset();
+        for (let key in ViewDict){
+            const view = ViewDict[key];
+            await render(view, state.activeDataset, state.viewMode);
+        } 
     }
 
-    const updateContrastWindow = (value) => {
+    const updateContrastLevel = async (value) => {
+        state.activeDataset.contrast.level = value;
+        updateRender();   
+    }
+
+    const updateContrastWindow = async (value) => {
         state.activeDataset.contrast.window = value;
-        state.activeDataset.updateRender();
+        updateRender();  
     }
 
     return (<div className='viewer-options'>
@@ -45,8 +57,27 @@ const ViewerOptions = () => {
     const { state, dispatch } = useAppState();
     const viewOptions = ['2D View', '3D View', 'Lightbox']
 
-    const handleViewModeUpdate = (mode) => {
-        dispatch({ type:ActionTypes.SET_VIEW_MODE, payload: mode })
+    const updateRender = async (viewMode) => {
+        if(!state.activeDataset) return;
+
+        state.activeDataset.setViewMode(viewMode);
+        await state.activeDataset.fetchDataset();
+        for (let key in ViewDict){
+            const view = ViewDict[key];
+  
+            view.init_dataset(state.activeDataset);
+            view.reset_roi();
+            await render(view, state.activeDataset, viewMode);
+            await renderROI(view, state.activeDataset, viewMode);
+        } 
+    }
+
+    const handleViewModeUpdate = async (mode) => {
+        dispatch({ type:ActionTypes.SET_VIEW_MODE, payload: mode });
+
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Loading data ...' }) });
+        await updateRender(mode);
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
     }
 
     return (<div className='viewer-options'>
@@ -96,18 +127,18 @@ const ROIControls = () => {
     const [brushSize, setBrushSize] = useState(5);
 
     const updateBrushType = (mode) => {
-        state.viewport.dataset.roi.useBrush = mode === 'Brush';
-        setBrushType(mode)
+        updateUseBrush(mode === 'Brush');
+        setBrushType(mode);
     }
 
-    const updateBrushSize = (value) => {
-        state.viewport.dataset.roi.brush = value;
+    const updateBrushSizeValue = (value) => {
+        updateBrushSize(value);
         setBrushSize(value);
     }
 
     const exportROIData = async () => {
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Exporting ROI Masks ...' }) });
-        const data = await state.viewport.dataset.roi.export();
+        const data = await state.activeDataset.roi.export();
         await APIDataService.exportROIData(data.data, data.shape);
         APIDataService.exportDownload();
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false, message: '' }) });
@@ -116,7 +147,7 @@ const ROIControls = () => {
     return (<div className='roi-controls'>
         <label>ROI Controls</label>
         <Select options={brushOptions} value={brushType} onChange={updateBrushType}></Select> 
-        <Slider label='Brush Size' value={brushSize} onChange={updateBrushSize} max={50}></Slider> 
+        <Slider label='Brush Size' value={brushSize} onChange={updateBrushSizeValue} max={50}></Slider> 
         <button className='export-roi button-dark' onClick={exportROIData}> Export ROI </button>
         <Divider></Divider>
     </div>)

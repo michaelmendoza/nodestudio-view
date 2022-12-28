@@ -1,4 +1,5 @@
 import { throttle } from '../../libraries/Utils';
+import { updatePixel } from '../../libraries/ROIRenderer';
 
 export const STATE = {
     NONE: 0,
@@ -63,7 +64,7 @@ class ChartControls {
 
         this.state = mousestate.left;
         if (this.state === STATE.ROI) {
-            throttle(() => this.viewer.dataset.roi.updatePixel(this.viewer.pointerPixel), 10, 'ROI-Viewer');
+            throttle(() => updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel), 10, 'ROI-Viewer');
         }
     }
 
@@ -84,7 +85,7 @@ class ChartControls {
             this.camera.updateProjectionMatrix();
         }
         if (this.state === STATE.ROI) {
-            this.viewer.dataset.roi.updatePixel(this.viewer.pointerPixel);
+            updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
         }
         if (this.state === STATE.ZOOM) {
             const dz = this.sensitivity * (event.movementY + event.movementX);

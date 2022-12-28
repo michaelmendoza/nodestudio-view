@@ -11,7 +11,6 @@ const initialState  = {
     datasets: {},
     activeDataset: null,
     viewMode: '2D View',
-    viewport: null,
     status: new Status()
 };
 

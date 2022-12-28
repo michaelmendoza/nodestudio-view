@@ -2,20 +2,21 @@ import './ViewportControls.scss';
 import { range } from '../../libraries/Utils';
 import Slider from '../Slider/Slider';
 import { useAppState } from '../../state';
+import { setDepth } from '../../libraries/ROIRenderer';
 
-const ViewportControls = ({ onUpdate }) => {
+const ViewportControls = ({ view, onUpdate }) => {
     const { state } = useAppState();
     const indices = state.activeDataset ? state.activeDataset.indices : [0,0,0];
     const maxIndices = state.activeDataset ? state.activeDataset.maxIndices : [1,1,1];
 
-    const view = [1, 2];
+    const viewIndices = [1, 2];
     let keys = range(0, indices.length);
-    keys = keys.filter((i) => i !== view[0] && i !== view[1] && indices[i] > 1);
+    keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] && indices[i] > 1);
 
     const handleIndexUpdate = (index, value) => {
         console.log(index, value);
         state.activeDataset.updateIndex(index, value);
-        state.activeDataset.roi.setDepth(value);
+        setDepth(view, value);
         onUpdate();
     }
 

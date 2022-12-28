@@ -1,20 +1,27 @@
 import * as THREE from 'three';
 import ChartControls from '../../components/Charts/ChartControls';
+import { setDepth } from '../../libraries/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
 import { ActionTypes } from '../AppReducers';
 
 const raycaster = new THREE.Raycaster();
 
+export const ViewDict = {}; 
+
 class Viewer {
 
-    constructor(ref, dispatch) {
-        this.id = crypto.randomUUID();
+    constructor(id, ref, dispatch) {
+        this.id = id;
+        ViewDict[id] = this;
+
         this.ref = ref;
         this.dispatch = dispatch;
 
         this.dataset = null;
         this.mesh_2D = null;
         this.mesh_lightbox = null;
+        this.roi_mesh_2D = null;
+        this.roi_mesh_lightbox = {};
 
         this.init();
 
@@ -48,6 +55,25 @@ class Viewer {
         this.controls = new ChartControls( this, this.camera, this.renderer.domElement);
     }
 
+    init_dataset = (dataset) => {
+        this.dataset = dataset;
+        this.controls.reset();
+    }
+
+    reset_roi = () => {
+        if (this.roi_mesh_2D) {
+            this.scene.remove(this.roi_mesh_2D);
+            this.roi_mesh_2D = null;
+        }
+    
+        if(this.roi_mesh_lightbox) {
+            Object.values(this.roi_mesh_lightbox).forEach((mesh) => { 
+                this.scene.remove(mesh)
+            });
+            this.roi_mesh_lightbox = {};
+        }
+    }
+
     animate = () => {
         requestAnimationFrame( this.animate );
         this.raycast();
@@ -60,7 +86,7 @@ class Viewer {
         const max_value = this.dataset.maxIndices[index];
         const inc_value = value + 1 > max_value ? max_value : value + 1;
         this.dataset.updateIndex(index, inc_value);
-        this.dataset.roi.setDepth(inc_value);
+        setDepth(this, inc_value);
     }
 
     decrement_index = (index = 0) => {
@@ -68,7 +94,7 @@ class Viewer {
         const value = this.dataset.indices[index];
         const dec_value = value - 1 < 0 ? 0 : value - 1;
         this.dataset.updateIndex(index, dec_value);
-        this.dataset.roi.setDepth(dec_value);
+        setDepth(this, dec_value);
     }
 
     raycast = () => {
@@ -104,9 +130,6 @@ class Viewer {
         this.pointerPixel = pointerPixel;
         this.pointerPixel.x = Math.floor(pointerPixel.x);
         this.pointerPixel.y = sizeY - Math.floor(pointerPixel.y) - 1; 
-
-        if (this.dispatch)
-            this.dispatch({ type: ActionTypes.SET_VIEWPORT, payload: this });
     }    
 
     handleResize = () => {
