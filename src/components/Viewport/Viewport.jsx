@@ -42,7 +42,7 @@ const Viewport = () => {
     }
 
     return (
-        <div className='viewport' tabIndex="0" > 
+        <div className='viewport'> 
             {
                 state.viewMode === '3D View' ? <div className='layout-row'>
                     <View id={30} style={ { width: '50%'} }></View>   
@@ -61,6 +61,7 @@ const View = ({ id, style = {} }) => {
     const ref = useRef();
     const { state, dispatch } = useAppState();
     const [ view, setView ] = useState();
+    const [ update, setUpdate ] = useState(0);
     const isInit = useRef(false);
 
     useEffect(()=>{
@@ -91,6 +92,7 @@ const View = ({ id, style = {} }) => {
     const handleIndexUpdate = async () => {
         updateRender(view, state.activeDataset, state.viewMode);
         renderROI(view, state.activeDataset, state.viewMode);
+        setUpdate(update+1);
     }
 
     const handleKeyDown = (event) => {
@@ -110,7 +112,7 @@ const View = ({ id, style = {} }) => {
     const factor = style.height === '50%' ? 0.5 : 1;
     const height = ((window.innerHeight - 100) * factor).toString() + 'px'; 
     return (
-        <div className='view' style={style} onKeyDown={handleKeyDown}> 
+        <div className='view' style={style} onKeyDown={handleKeyDown} tabIndex="-1"> 
             <ContextMenu domElement={ref.current}></ContextMenu>
 
             <div>
@@ -119,7 +121,7 @@ const View = ({ id, style = {} }) => {
                 { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
             </div>           
 
-            { state.viewMode === '2D View' ? <ViewportControls view={view} onUpdate={handleIndexUpdate}></ViewportControls> : null }
+            { state.viewMode === '2D View' ||  state.viewMode === '3D View' ? <ViewportControls view={view} onUpdate={handleIndexUpdate}></ViewportControls> : null }
         </div>
     )
 

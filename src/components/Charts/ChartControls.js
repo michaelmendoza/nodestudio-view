@@ -60,6 +60,7 @@ class ChartControls {
     }
 
     handleMouseDown = (event) => {
+        if(!this.viewer.dataset) return;
         if(event.button === 2) return;
 
         this.state = mousestate.left;

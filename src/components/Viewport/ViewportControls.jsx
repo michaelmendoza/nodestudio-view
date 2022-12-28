@@ -1,4 +1,5 @@
 import './ViewportControls.scss';
+import { useState } from 'react';
 import { range } from '../../libraries/Utils';
 import Slider from '../Slider/Slider';
 import { useAppState } from '../../state';
@@ -11,7 +12,7 @@ const ViewportControls = ({ view, onUpdate }) => {
 
     const viewIndices = [1, 2];
     let keys = range(0, indices.length);
-    keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] && indices[i] > 1);
+    keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] &&  maxIndices[i] > 1);
 
     const handleIndexUpdate = (index, value) => {
         console.log(index, value);
@@ -20,7 +21,7 @@ const ViewportControls = ({ view, onUpdate }) => {
         onUpdate();
     }
 
-    const dims = state?.viewport?.dataset?.metadata?.dims;
+    const dims = state?.activeDataset?.metadata?.dims;
     return (<div className='viewport-controls'>
         {
             keys?.map((key) => { 

@@ -10,6 +10,23 @@ export const throttle = (f, throttleTime = 100, id = '0') => {
     }, throttleTime);
 }
 
+/** Throttle function - with trailing edge function */
+export const throttle2 = (f, throttleTime = 100, id = '0') => {
+    refs[`${id}-trailing-edge`] = f;
+    if (refs[id]) return;
+    refs[`${id}-trailing-edge`] = undefined;
+
+    f()
+
+    refs[id] = setTimeout(() => {    
+        refs[id] = undefined;
+        if (refs[`${id}-trailing-edge`]) {
+            refs[`${id}-trailing-edge`]();
+            refs[`${id}-trailing-edge`] = undefined;
+        }
+    }, throttleTime);
+}
+
 /** Debouce function */
 export const debounce = (f, debounceTime = 100, id = '0') => {
     if (!refs[id]) f();

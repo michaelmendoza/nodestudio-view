@@ -1,19 +1,21 @@
 import * as THREE from 'three';
 import { Chart2D_FragmentShader, Chart2D_VertexShader } from "./ChartShaders";
-import { throttle } from "./Utils";
+import { throttle2 } from "./Utils";
 
 export const render = (viewport, dataset, viewMode) => {
     if(viewMode === '2D View') render2D(viewport, dataset);
+    if(viewMode === '3D View') render2D(viewport, dataset);
     if(viewMode === 'Lightbox') renderLightbox(viewport, dataset);
 }
 
 export const updateRender = async (viewport, dataset, viewMode) => {
     const _render = async() => {
+        console.log(`fetch - ${dataset.indices}`);
         await dataset.fetchDataset();
         await render(viewport, dataset, viewMode);
     }
 
-    throttle(() => _render(), 50, 'Dataset-Update');
+    throttle2(() => _render(), 10, 'Dataset-Update');
 }
 
 const create2DTexture = (data, shape) => {

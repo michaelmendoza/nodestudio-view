@@ -6,6 +6,7 @@ import { ROIOptions } from '../state/models/ROI';
 
 export const renderROI = (viewport, dataset, viewMode) => {
     if(viewMode === '2D View') render2D(viewport, dataset);
+    if(viewMode === '3D View') render2D(viewport, dataset);
     if(viewMode === 'Lightbox') renderLightbox(viewport, dataset);
 }
 
@@ -72,6 +73,7 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
 
     let depth;
     if(viewMode === '2D View') depth = dataset.indices[0];
+    if(viewMode === '3D View') depth = dataset.indices[0];
     if(viewMode === 'Lightbox') depth = viewport.pointerTargetROI.depth;
 
     const value = 255;
@@ -101,6 +103,9 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
 
     const texture = create2DTexture(roi.roi, roi.shape);
     if(dataset.viewMode === '2D View') {
+        viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
+    }
+    if(dataset.viewMode === '3D View') {
         viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
     }
     if(dataset.viewMode === 'Lightbox') {
