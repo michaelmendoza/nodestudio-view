@@ -1,14 +1,10 @@
 import { generateDefaultIndices, generateKeyFromIndices } from "../../libraries/ArrayIndexer";
 import { decodeDataset, scaleDataset } from "../../libraries/Data";
 import APIDataService from "../../services/APIDataService";
-
-import * as THREE from 'three';
-import { Chart2D_FragmentShader, Chart2D_VertexShader } from "../../components/Charts/ChartShaders";
-import { throttle } from "../../libraries/Utils";
 import Contrast from './Contrast';
 import ROIViewer from "../../components/Charts/ROIViewer";
 
-const viewOptions = ['2D View', '3D View', 'Lightbox'];
+export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 
 class Dataset {
 
@@ -16,6 +12,12 @@ class Dataset {
         this.file = file;
         this.metadata = null;
         this.dataset = null; // TODO: Refactor to dataslice 
+        this.dataslices = {
+            x: null,
+            y: null,
+            z: null,
+            lightbox: null
+        }
         this.viewMode = '2D View';
 
         this.indices = [0,0,0];
@@ -37,6 +39,12 @@ class Dataset {
         this.roi = new ROIViewer(this);
     }
 
+    getData = (viewKey = 'z') => {
+        if (this.viewMode === '2D View') return this.dataset;
+        if (this.viewMode === '3D View') return this.dataslices[viewKey]
+        if (this.viewMode === 'Lightbox') return this.dataslices.lightbox;
+    }
+
     setViewMode = (viewMode) => {
         this.viewMode = viewMode;
     }
@@ -56,22 +64,37 @@ class Dataset {
 
     /** Fetches Dataset from API */
     fetchDataset = async () => {
+        const fetch = async (sliceKey) => {
+            let data = await APIDataService.getFileData(this.file.id, sliceKey, this.dims);
+            if (data.isEncoded) {
+                data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
+            } 
+    
+            return scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype, useContrast:true, contrast: this.contrast })
+        }
+
         if (this.viewMode === 'Lightbox') {
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices, [0,1,2]);      
             this.dims = "['Lin','Col','Sli']"; 
+            this.dataset = await fetch(this.key);
+            this.dataslices.lightbox = this.dataset;
+        }
+        else if (this.viewMode === '3D View') {
+            const key0 = generateKeyFromIndices(this.metadata.shape, this.indices, [1, 2]);
+            const key1 = generateKeyFromIndices(this.metadata.shape, this.indices, [0, 2]);
+            const key2 = generateKeyFromIndices(this.metadata.shape, this.indices, [0, 1]);
+            this.dims = "['Lin','Col','Sli']"; 
+            
+            this.dataslices.z = await fetch(key0);
+            this.dataslices.x = await fetch(key1);
+            this.dataslices.y = await fetch(key2);
         }
         else { // 2D View
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices);
             this.dims = "['Sli','Lin','Col']";
+            this.dataset = await fetch(this.key);
         }
         
-        let data = await APIDataService.getFileData(this.file.id, this.key, this.dims);
-        if (data.isEncoded) {
-            data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
-        } 
-
-        this.dataset = data;
-        this.dataset = scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype, useContrast:true, contrast: this.contrast })
         this.update++;
     }
 }

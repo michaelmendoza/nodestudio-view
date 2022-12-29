@@ -14,3 +14,5 @@ A simple dicom/raw data viewer with ROI/Segmenation tools
 * [ ] Lightbox for raw data 
 * [ ] Line View: Line Graph from 2D Graph View
 * [ ] Run custom code -> View data output 
+* [ ] Image rotation
+* [ ] Histogram / Thresholding 

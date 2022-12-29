@@ -9,8 +9,8 @@ import { useState } from 'react';
 import APIDataService from '../../services/APIDataService';
 import Status from '../../state/models/Status';
 import { ViewDict } from '../../state/models/Viewer';
-import { ROIOptions, updateUseBrush, updateBrushSize } from '../../state/models/ROI';
-import { render, updateRender } from '../../libraries/DataRenderer';
+import { updateUseBrush, updateBrushSize } from '../../state/models/ROI';
+import { render } from '../../libraries/DataRenderer';
 import { renderROI } from '../../libraries/ROIRenderer';
 
 const FileDataInfo = () => {

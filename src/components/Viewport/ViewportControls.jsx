@@ -1,16 +1,24 @@
 import './ViewportControls.scss';
-import { useState } from 'react';
 import { range } from '../../libraries/Utils';
 import Slider from '../Slider/Slider';
 import { useAppState } from '../../state';
 import { setDepth } from '../../libraries/ROIRenderer';
 
-const ViewportControls = ({ view, onUpdate }) => {
+const ViewportControls = ({ view, onUpdate, datasliceKey = 'z' }) => {
     const { state } = useAppState();
     const indices = state.activeDataset ? state.activeDataset.indices : [0,0,0];
     const maxIndices = state.activeDataset ? state.activeDataset.maxIndices : [1,1,1];
 
-    const viewIndices = [1, 2];
+    let viewIndices;
+    if (datasliceKey === 'x') {
+        viewIndices = [0, 2];
+    }
+    else if (datasliceKey === 'y') {
+        viewIndices = [0, 1];
+    }
+    else { // datasliceKey == 'z'
+        viewIndices = [1, 2];
+    }
     let keys = range(0, indices.length);
     keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] &&  maxIndices[i] > 1);
 

@@ -10,13 +10,14 @@ export const ViewDict = {};
 
 class Viewer {
 
-    constructor(id, ref, dispatch) {
+    constructor(id, ref, dispatch, datasliceKey = 'z') {
         this.id = id;
         ViewDict[id] = this;
 
         this.ref = ref;
         this.dispatch = dispatch;
 
+        this.datasliceKey = datasliceKey;
         this.dataset = null;
         this.mesh_2D = null;
         this.mesh_lightbox = null;

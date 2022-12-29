@@ -21,18 +21,15 @@ export const updateRender = async (viewport, dataset, viewMode) => {
 const create2DTexture = (data, shape) => {
     if(shape[2] === undefined) shape[2] = 1;
 
-    const texture = new THREE.DataArrayTexture( data, shape[0], shape[1], shape[2] );
+    const texture = new THREE.DataArrayTexture( data, shape[1], shape[0], shape[2] );
     texture.format = THREE.RedFormat;
     texture.needsUpdate = true;
     return texture;
 }
 
-const create2DMaterial = (texture) => {
+const create2DMaterial = (texture, planeWidth = 100, planeHeight = 100) => {
     const VertexShader = Chart2D_VertexShader;
     const FragmentShader = Chart2D_FragmentShader;
-
-    const planeWidth = 100
-    const planeHeight = 100;
 
     const material = new THREE.ShaderMaterial( {
         uniforms: {
@@ -60,15 +57,18 @@ const render2D = (viewport, dataset) => {
         viewport.mesh_lightbox = null;
     }
 
-    const texture = create2DTexture(dataset.dataset.data, dataset.dataset.shape)
+    const _dataset = dataset.getData(viewport.datasliceKey);
+    const texture = create2DTexture(_dataset.data, _dataset.shape);
+
+    const factor = _dataset.shape[0] / _dataset.shape[1];
+    const planeWidth = 100
+    const planeHeight = planeWidth * factor;
 
     if (viewport.mesh_2D) {
         viewport.mesh_2D.material.uniforms[ "diffuse" ].value = texture;
     }
     else {
-        const planeWidth = 100
-        const planeHeight = 100;
-        const material = create2DMaterial(texture);
+        const material = create2DMaterial(texture, planeWidth, planeHeight);
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
         const mesh = new THREE.Mesh( geometry, material );
 
@@ -88,7 +88,7 @@ const renderLightbox = async (viewport, dataset) => {
         viewport.mesh_2D = null;
     }
 
-    const length = dataset.dataset.shape[0]; //dataset.shape[0]; //4;
+    const length = dataset.dataset.shape[0];
     const factor =  Math.ceil(Math.sqrt(length));
     const width = 100 / factor;
     const height = 100 / factor;

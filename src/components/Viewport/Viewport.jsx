@@ -1,10 +1,9 @@
 import './Viewport.scss';
 import { useEffect, useState, useRef } from 'react';
 import { useAppState, ActionTypes } from '../../state';
-import { debounce, throttle } from '../../libraries/Utils';
+import { debounce } from '../../libraries/Utils';
 import ViewportControls from './ViewportControls';
 import Dataset from '../../state/models/Dataset';
-import ROIViewer from '../Charts/ROIViewer';
 import Status from '../../state/models/Status';
 import Viewer from '../../state/models/Viewer';
 import ContextMenu from '../ContextMenu/ContextMenu';
@@ -45,18 +44,18 @@ const Viewport = () => {
         <div className='viewport'> 
             {
                 state.viewMode === '3D View' ? <div className='layout-row'>
-                    <View id={30} style={ { width: '50%'} }></View>   
+                    <View dataslicekey={'z'} id={'z'} style={ { width: '50%'} }></View>   
                     <div style={ { width: '50%'} }>
-                        <View id={31} style={ { height: '50%' } }></View>     
-                        <View id={32} style={ { height: '50%' } }></View>
+                        <View dataslicekey={'y'} id={'y'} style={ { height: '50%' } }></View>     
+                        <View dataslicekey={'x'} id={'x'} style={ { height: '50%' } }></View>
                     </div>
-                </div> : <View id={0}></View>
+                </div> : <View dataslicekey={'z'} id={0}></View>
             }
         </div>
     )
 }
 
-const View = ({ id, style = {} }) => {
+const View = ({ id, style = {}, dataslicekey = 'z' }) => {
     
     const ref = useRef();
     const { state, dispatch } = useAppState();
@@ -81,10 +80,11 @@ const View = ({ id, style = {} }) => {
         }
 
         debounce(renderView, 100, `view-${id}-render`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.activeDataset])
 
     const init = () => {
-        const viewer = new Viewer(id, ref, dispatch);
+        const viewer = new Viewer(id, ref, dispatch, dataslicekey);
         isInit.current = true;
         setView(viewer);
     }
@@ -121,7 +121,7 @@ const View = ({ id, style = {} }) => {
                 { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
             </div>           
 
-            { state.viewMode === '2D View' ||  state.viewMode === '3D View' ? <ViewportControls view={view} onUpdate={handleIndexUpdate}></ViewportControls> : null }
+            { state.viewMode === '2D View' ||  state.viewMode === '3D View' ? <ViewportControls view={view} onUpdate={handleIndexUpdate} datasliceKey={dataslicekey}></ViewportControls> : null }
         </div>
     )
 
