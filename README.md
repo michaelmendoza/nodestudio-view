@@ -16,3 +16,4 @@ A simple dicom/raw data viewer with ROI/Segmenation tools
 * [ ] Run custom code -> View data output 
 * [ ] Image rotation
 * [ ] Histogram / Thresholding 
+* [ ] Measurement tools

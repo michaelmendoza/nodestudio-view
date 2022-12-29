@@ -49,10 +49,11 @@ class ChartControls {
 		this.domElement.addEventListener( 'wheel', this.onMouseWheel.bind(this), { passive: false } );
     }
 
-    reset = () => {
+    reset = (factor = 1) => {
         this.camera.position.copy( this.position0 );
-        this.camera.zoom = this.zoom0;
+        this.camera.zoom = this.zoom0 * factor;
         this.state = STATE.NONE;
+        this.camera.updateProjectionMatrix();
     };
 
     onContextMenu = (event) => { 

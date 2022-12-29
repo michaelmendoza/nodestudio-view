@@ -65,9 +65,14 @@ const render2D = (viewport, dataset) => {
     const planeHeight = planeWidth * factor;
 
     if (viewport.mesh_2D) {
+        // Update mesh texture 
         viewport.mesh_2D.material.uniforms[ "diffuse" ].value = texture;
     }
     else {
+        // Reset camera controls and scale zoom with size of mesh 
+        viewport.controls.reset(1 / factor); 
+
+        // Create material, geometry & mesh and add to scene
         const material = create2DMaterial(texture, planeWidth, planeHeight);
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
         const mesh = new THREE.Mesh( geometry, material );

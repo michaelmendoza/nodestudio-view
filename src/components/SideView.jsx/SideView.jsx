@@ -5,13 +5,14 @@ import Tabs from '../Tabs/Tabs';
 import FileBrowser from '../FileBrowser/FileBrowser';
 import FileDataList from '../FileDataList/FIleDataList';
 import FileDataInfo from '../FileDataInfo/FileDataInfo';
-
+import FileInspector from '../FileInspector/FileInspector';
 
 const SideView = () => {
     return ( <div className="sideview">
-        <Tabs tabnames={[ 'Files', 'Inspect']}>
+        <Tabs tabnames={[ 'Files', 'Options', 'Inspect']}>
                 <FilesView></FilesView>
                 <FileDataInfo></FileDataInfo>
+                <FileInspector></FileInspector>
         </Tabs>
     </div>
     )

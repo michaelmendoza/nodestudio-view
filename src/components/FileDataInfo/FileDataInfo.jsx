@@ -1,7 +1,6 @@
 import './FileDataInfo.scss';
 import { useAppState } from '../../state/AppState';
 import Divider from '../Divider/Divider';
-import { formatNumber } from '../../libraries/Format';
 import Select from '../Select/Select';
 import { ActionTypes } from '../../state';
 import Slider from '../Slider/Slider';
@@ -17,9 +16,8 @@ const FileDataInfo = () => {
     const { state } = useAppState();
 
     return (<div className='file-data-info'>
-        <FileMetadataInspector></FileMetadataInspector>
-        { state.activeDataset && state.viewMode !== 'Lightbox' ? <ContrastOptions></ContrastOptions> : null }
         <ViewerOptions></ViewerOptions>
+        { state.activeDataset && state.viewMode !== 'Lightbox' ? <ContrastOptions></ContrastOptions> : null }
         <ROIControls></ROIControls>
     </div>)
 }
@@ -86,38 +84,6 @@ const ViewerOptions = () => {
         </div>
         <Divider></Divider>
     </div>)
-}
-
-const FileMetadataInspector = () => {
-    const { state } = useAppState();
-
-    const metadata = state?.activeDataset?.metadata;
-    const dims = metadata?.dims;
-    const shape = metadata?.shape;
-    const min = formatNumber( metadata?.min);
-    const max = formatNumber( metadata?.max);
-    const isComplex = metadata?.isComplex ? 'Yes' : 'No';
-
-    return (<div className='file-metadata-inspector'>
-        {
-            metadata ? <div>
-                <label>Metadata</label>
-                <div className='file-metadata-list'>
-                    <FileDataInfoItem label={'Dim Count'} info={dims?.length}></FileDataInfoItem>
-                    <FileDataInfoItem label={'Dims'} info={JSON.stringify(dims)?.replace(/"/g, '')}></FileDataInfoItem>
-                    <FileDataInfoItem label={'Shape'} info={ JSON.stringify(shape)}></FileDataInfoItem>
-                    <FileDataInfoItem label={'Min'} info={min}></FileDataInfoItem>
-                    <FileDataInfoItem label={'Max'} info={max}></FileDataInfoItem>
-                    <FileDataInfoItem label={'isComplex'} info={isComplex}></FileDataInfoItem>
-                </div>
-                <Divider></Divider>
-            </div> : null
-        }
-    </div>)
-}
-
-const FileDataInfoItem = ({label, info}) => {
-    return (<label className='info-item'> <span>{label}</span> <span>{info}</span> </label>)
 }
 
 const ROIControls = () => {
