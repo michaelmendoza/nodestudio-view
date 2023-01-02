@@ -8,7 +8,7 @@ export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 
 class Dataset {
 
-    constructor(file, viewport) {
+    constructor(file) {
         this.file = file;
         this.metadata = null;
         this.dataset = null; // TODO: Refactor to dataslice 
@@ -43,6 +43,17 @@ class Dataset {
         if (this.viewMode === '2D View') return this.dataset;
         if (this.viewMode === '3D View') return this.dataslices[viewKey]
         if (this.viewMode === 'Lightbox') return this.dataslices.lightbox;
+    }
+
+    getSliceShape = (datasliceKey) => {
+        const sliceShape = ({
+            z: [this.metadata.shape[1], this.metadata.shape[2]],
+            x: [this.metadata.shape[0], this.metadata.shape[1]],
+            y: [this.metadata.shape[0], this.metadata.shape[2]],
+            lightbox: [this.metadata.shape[1], this.metadata.shape[2]]
+        }[datasliceKey]);
+
+        return sliceShape;
     }
 
     setViewMode = (viewMode) => {

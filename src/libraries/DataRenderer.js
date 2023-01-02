@@ -62,6 +62,7 @@ const render2D = (viewport, dataset) => {
 
     const factor = _dataset.shape[0] / _dataset.shape[1];
     const planeWidth = 100
+
     const planeHeight = planeWidth * factor;
 
     if (viewport.mesh_2D) {
@@ -71,6 +72,8 @@ const render2D = (viewport, dataset) => {
     else {
         // Reset camera controls and scale zoom with size of mesh 
         viewport.controls.reset(1 / factor); 
+        viewport.grid_helper.scale.set( 1, 1 * factor, 1 );
+        viewport.setGridHelper([planeHeight, planeWidth]);
 
         // Create material, geometry & mesh and add to scene
         const material = create2DMaterial(texture, planeWidth, planeHeight);

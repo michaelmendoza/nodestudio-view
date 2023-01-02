@@ -61,6 +61,8 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
     const { state, dispatch } = useAppState();
     const [ view, setView ] = useState();
     const [ update, setUpdate ] = useState(0);
+    const [ pixel, setPixel ] = useState({ x:null, y: null, value: null });
+    const [ showPixel, setShowPixel] = useState(false);
     const isInit = useRef(false);
 
     useEffect(()=>{
@@ -109,16 +111,29 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
         }
     }
 
+    const handleMouseMove = () => {
+        setPixel(view?.pointerPixel);
+        setShowPixel(view?.pointerPixel.value !== undefined ? true : false);
+    }
+
+    const handleMouseLeave = () => {
+        setShowPixel(false);
+    }
+
     const factor = style.height === '50%' ? 0.5 : 1;
     const height = ((window.innerHeight - 100) * factor).toString() + 'px'; 
+
     return (
-        <div className='view' style={style} onKeyDown={handleKeyDown} tabIndex="-1"> 
+        <div className='view' style={style} onKeyDown={handleKeyDown} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} tabIndex="-1"> 
             <ContextMenu domElement={ref.current}></ContextMenu>
+
+            <div className='view-pixel-info'>
+                { showPixel ? `x:${ pixel?.x } y:${ pixel?.y} value:${pixel?.value}` : '' }
+            </div>
 
             <div>
                 <div className='webgl-viewport' style={{width:'100%', height:height}} ref={ref}>
                 </div>
-                { /*  <div> u:{ p?.x } v:{ p?.y }</div> */ }
             </div>           
 
             { state.viewMode === '2D View' ||  state.viewMode === '3D View' ? <ViewportControls view={view} onUpdate={handleIndexUpdate} datasliceKey={dataslicekey}></ViewportControls> : null }

@@ -7,3 +7,11 @@
     color: #FEFEFE;
     background-color: darken($app-background-color, 2%);
 }
+
+.view-pixel-info {
+    position: absolute;
+    left: 1em;
+    bottom: 3em;
+    z-index: 100;
+    color: #FEFEFE66;
+}

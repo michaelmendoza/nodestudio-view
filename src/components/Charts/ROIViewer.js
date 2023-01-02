@@ -1,7 +1,4 @@
-import * as THREE from 'three';
 import { pixelArrayToBase64 } from '../../libraries/Data';
-import { throttle } from '../../libraries/Utils';
-import { Chart2D_VertexShader, ROI_FragmentShader } from "./ChartShaders";
 
 class ROIViewer {
     constructor(dataset) {

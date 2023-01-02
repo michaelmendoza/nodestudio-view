@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import ChartControls from '../../components/Charts/ChartControls';
 import { setDepth } from '../../libraries/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
-import { ActionTypes } from '../AppReducers';
+import { GridHelper } from '../../libraries/MeshFactory';
 
 const raycaster = new THREE.Raycaster();
 
@@ -23,6 +23,7 @@ class Viewer {
         this.mesh_lightbox = null;
         this.roi_mesh_2D = null;
         this.roi_mesh_lightbox = {};
+        this.grid_helper = null;
 
         this.init();
 
@@ -40,20 +41,14 @@ class Viewer {
         this.camera.position.z = 10;
         
         this.scene = new THREE.Scene();
-
-        const size = 100;
-        const divisions = 1;
-        const gridHelper = new THREE.GridHelper( size, divisions );
-        gridHelper.rotation.x = Math.PI / 2;
-        gridHelper.position.z = 1;
-        this.scene.add( gridHelper );
-
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.setSize( width, height );
         this.ref.current.appendChild( this.renderer.domElement );
 
         this.pointer = null;
         this.controls = new ChartControls( this, this.camera, this.renderer.domElement);
+
+        this.setGridHelper([100, 100]);
     }
 
     init_dataset = (dataset) => {
@@ -102,7 +97,8 @@ class Viewer {
         if (!this.pointer) return;
         if (!this.dataset) return;
         if (!this.dataset?.dataset?.shape) return
-
+        this.pointerPixel = new THREE.Vector2();
+        
         raycaster.setFromCamera( this.pointer, this.camera );
         // calculate objects intersecting the picking ray
         const intersects = raycaster.intersectObjects( this.scene.children );
@@ -120,17 +116,16 @@ class Viewer {
 
         if (!pointerUV) return;
 
-        const sizeX = this.dataset.metadata.shape[2];
-        const sizeY = this.dataset.metadata.shape[1];
- 
-        let pointerPixel = new THREE.Vector2();
-        pointerPixel.x = pointerUV.x * sizeX;
-        pointerPixel.y = pointerUV.y * sizeY;
+        // Get pointer pixel (x, y)
+        const sliceShape = this.dataset.getSliceShape(this.datasliceKey);
+        const sizeX = sliceShape[1]; //this.dataset.metadata.shape[2];
+        const sizeY = sliceShape[0]; //this.dataset.metadata.shape[1];
+        this.pointerPixel.x = Math.floor(pointerUV.x * sizeX);
+        this.pointerPixel.y = sizeY - Math.floor(pointerUV.y * sizeY) - 1;
 
-        this.pointerUV = pointerUV;
-        this.pointerPixel = pointerPixel;
-        this.pointerPixel.x = Math.floor(pointerPixel.x);
-        this.pointerPixel.y = sizeY - Math.floor(pointerPixel.y) - 1; 
+        // Get pixel value
+        const { x, y } = this.pointerPixel;
+        this.pointerPixel.value = this.dataset.dataset.data[x + y * sizeY];
     }    
 
     handleResize = () => {
@@ -165,6 +160,20 @@ class Viewer {
         pointer.y = - (( y / height ) * 2 - 1);
 
         this.pointer = pointer;
+    }
+
+    /** Adds a grid helper mesh to view scene. Updates if already exisits */
+    setGridHelper = (size = [100, 100], divisions = 1) => {
+        if (this.grid_helper) {
+            this.scene.remove(this.grid_helper);
+        }
+
+        const gridHelper = new GridHelper( size, divisions );
+        gridHelper.name = 'grid';
+        gridHelper.rotation.x = Math.PI / 2;
+        gridHelper.position.z = 1;
+        this.scene.add( gridHelper );
+        this.grid_helper = gridHelper;
     }
 }
 

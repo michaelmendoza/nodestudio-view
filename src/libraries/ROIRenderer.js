@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { pixelArrayToBase64 } from './Data';
-import { throttle } from './Utils';
 import { Chart2D_VertexShader, ROI_FragmentShader } from "./ChartShaders";
 import { ROIOptions } from '../state/models/ROI';
 
@@ -12,8 +10,16 @@ export const renderROI = (viewport, dataset, viewMode) => {
 
 const render2D = (viewport, dataset) => {
 
-    const planeWidth = 100;
-    const planeHeight = 100;
+    const sliceShape = ({
+        z: [dataset.roi.shape[0], dataset.roi.shape[1]],
+        x: [dataset.roi.shape[2], dataset.roi.shape[1]],
+        y: [dataset.roi.shape[2], dataset.roi.shape[0]]
+    }[viewport.datasliceKey]);
+
+    const factor = sliceShape[0] / sliceShape[1];
+    const planeWidth = 100
+    const planeHeight = planeWidth * factor;
+    
     const texture = create2DTexture(dataset.roi.roi, dataset.roi.shape);
 
     if (viewport.roi_mesh_2D) {
@@ -21,7 +27,7 @@ const render2D = (viewport, dataset) => {
         viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
     }
     else {
-        const material = createMaterial(texture, dataset.indices[0]);
+        const material = createMaterial( texture, dataset.indices[0], planeWidth, planeHeight );
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
         const mesh = new THREE.Mesh( geometry, material );
         mesh.name = 'roi';
@@ -66,10 +72,7 @@ const renderSlice = (viewport, texture, planeWidth, planeHeight, planeOffset, in
 
 export const updatePixel = (viewport, dataset, viewMode, p) => {
     const roi = dataset.roi;
-
     console.log('update', p)
-    const x = p.x;
-    const y = p.y;
 
     let depth;
     if(viewMode === '2D View') depth = dataset.indices[0];
