@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Chart2D_VertexShader, ROI_FragmentShader } from "./ChartShaders";
 import { ROIOptions } from '../state/models/ROI';
+import { ViewDict } from '../state/models/Viewer';
 
 export const renderROI = (viewport, dataset, viewMode) => {
     if(viewMode === '2D View') render2D(viewport, dataset);
@@ -76,40 +77,64 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
 
     let depth;
     if(viewMode === '2D View') depth = dataset.indices[0];
-    if(viewMode === '3D View') depth = dataset.indices[0];
+    if(viewMode === '3D View') depth = dataset.getSliceDepth(viewport.datasliceKey);
     if(viewMode === 'Lightbox') depth = viewport.pointerTargetROI.depth;
+    const datasliceKey = viewport.datasliceKey;
 
     const value = 255;
     const brush = ROIOptions.brush;
     const height = roi.shape[0];
     const width = roi.shape[1];
-    const dz = height * width * depth;
+    const dx = 1;
+    const dy = width;
+    const dz = height * width;
+
+    const points = [];
 
     if(brush === 1) {
-        roi.roi[p.x + width * p.y + dz] = ROIOptions.useBrush ? value : 0;
+        points.push({x: p.x, y: p.y, z: depth });
     }
     if(brush >= 2) {
         for (let i = 0; i < brush * brush; i++) {
             const db = - Math.floor(brush / 2);
             const x = p.x + i % brush + db;
             const y = (p.y + Math.floor(i / brush)) + db;
-            const dy = width * y;
 
             const x2 = (p.x - x)*(p.x - x)
             const y2 = (p.y - y)*(p.y - y) 
             const r2 = (brush / 2)*(brush / 2)
             const isCircle = x2 + y2 <= r2
             if (isCircle)
-                roi.roi[x + dy + dz] = ROIOptions.useBrush ? value : 0;
+                points.push({x: x, y: y, z: depth });
         }
     }
 
+    points.forEach((point) => {
+
+        let index = 0;
+        if (datasliceKey === 'z' || datasliceKey === 'lightbox') {
+            index = point.x * dx + point.y * dy + point.z * dz;
+        }
+        if (datasliceKey === 'x') {
+            index = point.x * dx + point.z * dy + point.y * dz;
+        }
+        if (datasliceKey === 'y') {
+            index = point.z * dx + point.x * dy + point.y * dz;
+        }
+
+        roi.roi[index] = ROIOptions.useBrush ? value : 0;
+    })
+
     const texture = create2DTexture(roi.roi, roi.shape);
-    if(dataset.viewMode === '2D View') {
+    if(dataset.viewMode === '2D View' ) {
         viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
     }
     if(dataset.viewMode === '3D View') {
-        viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
+        // Update all views
+        for (let key in ViewDict){
+            const view = ViewDict[key];
+            view.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;
+        }     
     }
     if(dataset.viewMode === 'Lightbox') {
         viewport.roi_mesh_lightbox[depth].material.uniforms[ "diffuse" ].value = texture;

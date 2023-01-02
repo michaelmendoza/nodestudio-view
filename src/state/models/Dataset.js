@@ -56,6 +56,17 @@ class Dataset {
         return sliceShape;
     }
 
+    getSliceDepth = (datasliceKey) => {
+        const depth = ({
+            z: this.indices[0],
+            y: this.indices[2],
+            x: this.indices[1],
+            lightbox: this.indices[0]
+        }[datasliceKey]);
+
+        return depth;
+    }
+
     setViewMode = (viewMode) => {
         this.viewMode = viewMode;
     }
