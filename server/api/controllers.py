@@ -35,7 +35,7 @@ def encode_data(data, min, max, dtype='uint16'):
     scaled_data = np.ascontiguousarray(scaled_data)
     encodedData = base64.b64encode(scaled_data)
 
-    return encodedData, dtype, _min, _max
+    return encodedData, dtype, _min, _max, resolution
 
 def get_data(fileid, key, encode = True, dims = ['Sli','Lin','Col']):
     # Retrive data
@@ -59,14 +59,15 @@ def get_data(fileid, key, encode = True, dims = ['Sli','Lin','Col']):
 
     # Encode data and generate basic statistics
     if (encode):
-        data, dtype, min, max = encode_data(data, dataset['min'], dataset['max'])
+        data, dtype, min, max, resolution = encode_data(data, dataset['min'], dataset['max'])
     else:
         data = np.reshape(data, -1).tolist()
         dtype = data.dtype
         min = dataset['min']
         max = dataset['max']
+        resolution = None
     
-    return  { 'data': data, 'shape': shape, 'dims': dataset_dims, 'min':min, 'max':max, 'dtype': dtype, 'isComplex': isComplex, 'isEncoded': encode }
+    return  { 'data': data, 'shape': shape, 'dims': dataset_dims, 'min':min, 'max':max, 'resolution': resolution, 'dtype': dtype, 'isComplex': isComplex, 'isEncoded': encode }
 
 def get_metadata(fileid):
     dataset = io.get_filedata(fileid)

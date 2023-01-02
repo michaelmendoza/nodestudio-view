@@ -1,7 +1,7 @@
 import './Viewport.scss';
 import { useEffect, useState, useRef } from 'react';
 import { useAppState, ActionTypes } from '../../state';
-import { debounce } from '../../libraries/Utils';
+import { debounce, toNumberWithCommas } from '../../libraries/Utils';
 import ViewportControls from './ViewportControls';
 import Dataset from '../../state/models/Dataset';
 import Status from '../../state/models/Status';
@@ -113,7 +113,7 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
 
     const handleMouseMove = () => {
         setPixel(view?.pointerPixel);
-        setShowPixel(view?.pointerPixel.value !== undefined ? true : false);
+        setShowPixel(view?.pointerPixel?.value !== undefined ? true : false);
     }
 
     const handleMouseLeave = () => {
@@ -128,7 +128,7 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
             <ContextMenu domElement={ref.current}></ContextMenu>
 
             <div className='view-pixel-info'>
-                { showPixel ? `x:${ pixel?.x } y:${ pixel?.y} value:${pixel?.value}` : '' }
+                { showPixel ? `x:${ pixel?.x } y:${ pixel?.y} value:${toNumberWithCommas(pixel?.value)}` : '' }
             </div>
 
             <div>

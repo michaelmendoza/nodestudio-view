@@ -17,6 +17,8 @@ export const scaleDataset = ({ data, shape, min, max, useContrast = false, contr
     const dataset = { shape, min, max }
     dataset.data = uint8Array;
     dataset.isScaled = true;
+    dataset.scalingResolution = 255;
+    dataset.unscaledData = data;
     return dataset;
 }
 

@@ -63,10 +63,20 @@ export const isNumberOrString = (value) => {
 }
 
 /**
- * Returns a number with commas
+ * Returns a number with commas. If number less than digit precision, 
+ * uses scientific notation.
  * Ref: https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
  */
  export function toNumberWithCommas(x, digits = 2) {
-    if(!x) return;
-    return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if(x === null) return;
+    if(x === undefined) return;
+    if(!isNumber(x)) return;
+    if(x === 0) return 0;
+    if(x > 1 * 10 ** -2) {
+        return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    }
+    else {
+        return Number.parseFloat(x).toExponential(digits);
+    }
 }

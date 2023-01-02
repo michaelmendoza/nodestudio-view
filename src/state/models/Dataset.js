@@ -104,6 +104,7 @@ class Dataset {
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices);
             this.dims = "['Sli','Lin','Col']";
             this.dataset = await fetch(this.key);
+            this.dataslices.z = this.dataset;
         }
         
         this.update++;

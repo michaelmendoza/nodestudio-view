@@ -118,14 +118,25 @@ class Viewer {
 
         // Get pointer pixel (x, y)
         const sliceShape = this.dataset.getSliceShape(this.datasliceKey);
-        const sizeX = sliceShape[1]; //this.dataset.metadata.shape[2];
-        const sizeY = sliceShape[0]; //this.dataset.metadata.shape[1];
+        const sizeX = sliceShape[1]; 
+        const sizeY = sliceShape[0];
         this.pointerPixel.x = Math.floor(pointerUV.x * sizeX);
         this.pointerPixel.y = sizeY - Math.floor(pointerUV.y * sizeY) - 1;
 
         // Get pixel value
         const { x, y } = this.pointerPixel;
-        this.pointerPixel.value = this.dataset.dataset.data[x + y * sizeY];
+        const dataset = this.dataset.dataslices[this.datasliceKey];
+        const data = dataset.unscaledData;
+        const index = x + y * sizeX;
+        const value = data[index];
+        const max = this.dataset.metadata.max;
+        const min = this.dataset.metadata.min;
+        const resolution = dataset.max;
+        let org_value = value * (max - min) / resolution + min;
+        if (this.dataset.file.type === 'dicom')
+            org_value = Math.round(org_value);
+
+        this.pointerPixel.value = org_value;
     }    
 
     handleResize = () => {

@@ -1,10 +1,5 @@
 import * as THREE from 'three';
-
-/** Returns boolean for whether a value is a number */
-export const isNumber = (value) => (
-    (value != null) &&
-    (value !== '') &&
-    !isNaN(Number(value.toString())));
+import { isNumber } from './Utils';
 
 export class GridHelper extends THREE.LineSegments {
 
@@ -23,7 +18,6 @@ export class GridHelper extends THREE.LineSegments {
 
 		const vertices = [], colors = [];
 
-        //let k = - halfSize;
         let k = [- halfSize[0], - halfSize[1]]
 
 		for ( let i = 0, j = 0; i <= divisions; i ++ ) {
