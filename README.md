@@ -1,8 +1,16 @@
 # Nodestudio View
 
-A simple dicom/raw data viewer with ROI/Segmenation tools
+A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
 
-# TODO:
+## Features
+
+- Loading dicom and raw data (from Siemens MRI scanner)
+- Can view data in 2D, 3D View, and Lightbox modes
+- Allows for viewing slices in N-dim dataset 
+- Simple ROI tools for manual segmentation of images
+- Control Pan/Zoom/ROI select with Left Mouse. Right mouse to switch options.
+
+### TODO:
 
 * [x] Ability to switch between 2D and Lightbox modes 
 * [x] ROI Persisiece between data switch
@@ -23,3 +31,4 @@ A simple dicom/raw data viewer with ROI/Segmenation tools
 * [ ] Histogram / Thresholding 
 * [ ] Measurement tools
 * [ ] ChartControl: Added Slices option
+* [ ] View Img, Complex, Mag, Phase of data 
