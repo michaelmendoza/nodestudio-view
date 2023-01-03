@@ -1,5 +1,5 @@
 
-.file-metadata-inspector {
+.file-inspector {
 
     .info-item {
         font-size: 0.9em;
@@ -7,6 +7,15 @@
         align-items: center;
         justify-content: center;
         flex-direction: row;
-        justify-content:space-between
+        justify-content:space-between;
+    }
+
+    .info-small-text {
+        font-size: 0.75em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 75%;
+        white-space: nowrap;
+        text-align: right;
     }
 }

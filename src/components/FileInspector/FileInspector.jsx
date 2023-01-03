@@ -4,6 +4,30 @@ import Divider from '../Divider/Divider';
 import { formatNumber } from '../../libraries/Format';
 
 const FileInspector = () => {
+    return (<div className='file-inspector'>
+        <FileDataInspector></FileDataInspector>
+        <FileMetadataInspector></FileMetadataInspector>
+    </div>)
+}
+
+const FileDataInspector = () => {
+
+    const { state } = useAppState();
+    const file = state.activeFile;
+
+    return (<div>
+        {
+            file ? <div className='file-data-inspector'>
+                <label>File</label>
+                <FileDataInfoItem label={'Name'} info={file.name}></FileDataInfoItem>
+                <FileDataInfoItemSmallText label={'ID'} info={file.id}></FileDataInfoItemSmallText>
+                <FileDataInfoItem label={'Type'} info={file.type}></FileDataInfoItem>
+            </div> : null
+        }
+    </div>)
+}
+
+const FileMetadataInspector = () => {
     const { state } = useAppState();
 
     const metadata = state?.activeDataset?.metadata;
@@ -34,6 +58,10 @@ const FileInspector = () => {
 
 const FileDataInfoItem = ({label, info}) => {
     return (<label className='info-item'> <span>{label}</span> <span>{info}</span> </label>)
+}
+
+const FileDataInfoItemSmallText = ({label, info}) => {
+    return (<label className='info-item'> <span>{label}</span> <span className='info-small-text'>{info}</span> </label>)
 }
 
 export default FileInspector;

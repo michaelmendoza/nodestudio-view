@@ -12,8 +12,8 @@ def get_path_query(relative_path):
 def get_files():
     return io.get_files()
 
-def read_file(filepath, filename: str = ''):
-    io.read_file(filepath, filename)
+def read_file(filepath, filename, id, options ):
+    io.read_file(filepath, filename, id, options)
     return get_files()
     
 def encode_data(data, min, max, dtype='uint16'):

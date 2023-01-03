@@ -10,12 +10,13 @@ A simple dicom/raw data viewer with ROI/Segmenation tools
 * [x] 3D View Mode -> 3 slices (axial, sag, cor)
 * [x] Query data value on hover on point
 * [x] Fix Query data value on hover on point - for sag, cor slices
-* [ ] Fix ROI for sag, cor slices
 * [x] Fix GridBox for 3D View
-* [ ] Depth -> Multidimenstional includes all dims 
-* [ ] Import ROI data
-* [ ] Lightbox for raw data 
+* [x] Depth -> Multidimenstional includes all dims 
 * [ ] Line View: Line Graph from 2D Graph View
+* [ ] Import ROI data
+* [ ] Read png images, and python data .npy files
+* [ ] Fix ROI viewing for sag, cor slices
+* [ ] Lightbox for raw data 
 * [ ] Run custom code -> View data output 
 * [ ] 3D View Controls 
 * [ ] Image rotation

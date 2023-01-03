@@ -6,8 +6,7 @@ from xmlrpc.client import Boolean
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-
-from api import controllers
+from api import controllers, models
 
 def handle_exception(func):
     @wraps(func)
@@ -32,11 +31,11 @@ async def get_files():
     data = controllers.get_files()
     return { 'message': 'Loaded files', 'data': data }
 
-@router.get("/files/add")
+@router.post("/files/add")
 @handle_exception
-async def read_file(filepath: str, filename: str = ''):
+async def read_file(filepath: str, filename: str = '', id: str = '', fileoptions: models.FileDataOptions = models.FileDataOptions()): 
     ''' Reads files in filepath '''
-    data = controllers.read_file(filepath, filename)
+    data = controllers.read_file(filepath, filename, id, fileoptions)
     return { 'message': 'Read file', 'data': data }
 
 @router.get("/files/data")
@@ -67,13 +66,9 @@ async def get_path_query(path: str):
     data = controllers.get_path_query(path)
     return { 'message': 'Retrieved path filesystem query', 'data': data }
 
-class ROIData(BaseModel):
-    roi_data: str
-    shape: List[int] = []
-
 @router.post("/roi/export")
 @handle_exception
-async def export_roi_data(data: ROIData):
+async def export_roi_data(data: models.ROIData):
     ''' Exports ROI Data '''
     data = controllers.export_roi_data(data.roi_data, data.shape)
     return { 'message': 'Exported ROI Data into roi_images.zip file.', 'data': data }

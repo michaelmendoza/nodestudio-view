@@ -19,6 +19,7 @@ const FileDataInfo = () => {
         <ViewerOptions></ViewerOptions>
         { state.activeDataset && state.viewMode !== 'Lightbox' ? <ContrastOptions></ContrastOptions> : null }
         <ROIControls></ROIControls>
+        <FileDataControl></FileDataControl>
     </div>)
 }
 
@@ -111,10 +112,49 @@ const ROIControls = () => {
     }
 
     return (<div className='roi-controls'>
-        <label>ROI Controls</label>
+        <label>ROI</label>
         <Select options={brushOptions} value={brushType} onChange={updateBrushType}></Select> 
         <Slider label='Brush Size' value={brushSize} onChange={updateBrushSizeValue} max={50}></Slider> 
         <button className='export-roi button-dark' onClick={exportROIData}> Export ROI </button>
+        <Divider></Divider>
+    </div>)
+}
+
+const Checkbox = ({ label, value, onChange }) => {
+    return (
+      <label className='checkbox layout-row-center layout-space-between'>
+        <span> {label} </span>
+        <span> <input type="checkbox" checked={value} onChange={onChange}/> </span>
+      </label>
+    );
+  };
+
+const FileDataControl = () => {
+    const { state, dispatch } = useAppState();
+    const imageOptions = ['image', 'k-Space']
+    const [imageMode, setImageMode] = useState('image');
+    const [doChaAverage, setDoChaAverage] = useState(true);
+    const [doAveAverage, setDoAveAverage] = useState(true);
+
+    const updateImageOption = (mode) => {
+        setImageMode(mode);
+    }
+
+    const reloadData = async () => {
+        const options =  { datatype: imageMode, doChaAverage, doChaSOSAverage:false, doAveAverage };
+        const file = state.activeFile;
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Load DataFile ...'}) });
+        await APIDataService.addFiles(file.path, file.name, file.id, options);
+        dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({show: false}) });
+        dispatch({ type:ActionTypes.SET_ACTIVE_FILE, payload: { ...state.activeFile } })
+    }
+
+    return (<div>
+        <label>FileData</label>
+        <Select options={imageOptions} value={imageMode} onChange={updateImageOption}></Select>
+        <div> <Checkbox label={'Average Channel: Cha'} value={doChaAverage} onChange={() => { setDoChaAverage(!doChaAverage) }}></Checkbox> </div>
+        <div> <Checkbox label={'Average Channel: Ave'} value={doAveAverage} onChange={() => { setDoAveAverage(!doAveAverage) }}></Checkbox> </div>
+        <button className='button-dark' onClick={reloadData}> Reload Data </button>
         <Divider></Divider>
     </div>)
 }

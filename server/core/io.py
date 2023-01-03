@@ -5,6 +5,8 @@ import pydicom
 import numpy as np
 import mapvbvd
 
+from api import models
+
 files_loaded = {}
 
 def get_filedata(id):
@@ -16,8 +18,8 @@ def get_filedata(id):
 def get_files():
     return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'] } for file in files_loaded.values() ]
 
-def read_file(filepath, name: str = '', id = None):
-    id = uuid.uuid1().hex if id == None else id
+def read_file(filepath, name: str = '', id = None, options = models.FileDataOptions()):
+    id = uuid.uuid1().hex if (id == None or id == '') else id
     if name == '':
         name =  f'File {len(files_loaded)}'
 
@@ -28,7 +30,8 @@ def read_file(filepath, name: str = '', id = None):
         paths = glob.glob(filepath + '*.dat') 
         for filename in paths:
             id = uuid.uuid1().hex
-            files_loaded[id] = { 'id':id, 'path':filename, 'name':name, 'type':'raw data', 'data': read_rawdata(filename)} 
+            data = read_rawdata(filepath, options.datatype, options.doChaAverage, options.doChaSOSAverage, options.doAveAverage)
+            files_loaded[id] = { 'id':id, 'path':filename, 'name':name, 'type':'raw data', 'data': data } 
 
         # Read raw data files in folder (load one dataset/datagroup per folder)
         paths = glob.glob(filepath + '*.dcm')        
@@ -39,7 +42,8 @@ def read_file(filepath, name: str = '', id = None):
         # Check for file extension and read dicom / raw data files
         filename, file_extension = os.path.splitext(filepath)
         if file_extension == '.dat':
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'raw data', 'data': read_rawdata(filepath)}  
+            data = read_rawdata(filepath, options.datatype, options.doChaAverage, options.doChaSOSAverage, options.doAveAverage)
+            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'raw data', 'data': data }
         if file_extension == '.dcm' or file_extension == '.ima':
             files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
     
