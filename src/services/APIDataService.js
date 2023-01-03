@@ -10,6 +10,8 @@ const APIDataService = {
 
     addFiles: (filepath, filename, id = '', options = undefined) => fetchAPI(`${dataUrl}/files/add?filepath=${filepath}&filename=${filename}&id=${id}`, FetchTypes.POST, options),
 
+    removeFile: (id) => fetchAPI(`${dataUrl}/files/remove?id=${id}`, FetchTypes.GET),
+
     getFileData: (id, key, dims) => fetchAPI(`${dataUrl}/files/data?id=${id}&key=${key}&encode=${true}&dims=${dims}`, FetchTypes.GET),
 
     getFileMetadata: (id) => fetchAPI(`${dataUrl}/files/metadata?id=${id}`, FetchTypes.GET),

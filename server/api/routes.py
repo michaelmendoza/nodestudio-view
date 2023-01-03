@@ -38,6 +38,13 @@ async def read_file(filepath: str, filename: str = '', id: str = '', fileoptions
     data = controllers.read_file(filepath, filename, id, fileoptions)
     return { 'message': 'Read file', 'data': data }
 
+@router.get("/files/remove")
+@handle_exception
+async def remove_file(id: str = ''):
+    ''' Retrieves all loaded files '''
+    data = controllers.remove_file(id)
+    return { 'message': f'Removed file: ${id}', 'data': data }
+
 @router.get("/files/data")
 @handle_exception
 async def get_data(id: str, key: str, encode: Boolean, dims: str):

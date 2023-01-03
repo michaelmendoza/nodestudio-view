@@ -11,9 +11,14 @@ files_loaded = {}
 
 def get_filedata(id):
     ''' Retrieves file data from files_loaded cache. '''
-
     if(id in files_loaded):
         return files_loaded[id]['data']
+
+def remove_file(id):
+    ''' Removes file data from file_loaded cache '''
+    if(id in files_loaded):
+        del files_loaded[id]
+    return id
 
 def get_files():
     return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'] } for file in files_loaded.values() ]

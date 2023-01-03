@@ -16,6 +16,9 @@ def read_file(filepath, filename, id, options ):
     io.read_file(filepath, filename, id, options)
     return get_files()
     
+def remove_file(id):
+    return io.remove_file(id)
+
 def encode_data(data, min, max, dtype='uint16'):
 
     if (dtype == 'uint8'):
