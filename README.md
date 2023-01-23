@@ -22,6 +22,7 @@ A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
 * [x] Depth -> Multidimenstional includes all dims 
 * [ ] Multiclass Segmenation
 * [ ] Read nifty file
+* [ ] Compare multiple segmenations
 * [ ] Line View: Line Graph from 2D Graph View
 * [ ] Import ROI data
 * [ ] Read png images, and python data .npy files
