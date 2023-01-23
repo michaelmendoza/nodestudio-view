@@ -20,6 +20,8 @@ A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
 * [x] Fix Query data value on hover on point - for sag, cor slices
 * [x] Fix GridBox for 3D View
 * [x] Depth -> Multidimenstional includes all dims 
+* [ ] Multiclass Segmenation
+* [ ] Read nifty file
 * [ ] Line View: Line Graph from 2D Graph View
 * [ ] Import ROI data
 * [ ] Read png images, and python data .npy files
