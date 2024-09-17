@@ -23,6 +23,15 @@ def remove_file(id):
 def get_files():
     return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'] } for file in files_loaded.values() ]
 
+def read_npy(filepath, name: str = '', id = None):
+    id = uuid.uuid1().hex if (id == None or id == '') else id
+    if name == '':
+        name =  f'File {len(files_loaded)}'
+
+    # Read npy files
+    data = np.load(filepath)
+    return { 'id':id, 'path':filepath, 'name':name, 'type':'npy', 'data': data }
+
 def read_file(filepath, name: str = '', id = None, options = models.FileDataOptions()):
     id = uuid.uuid1().hex if (id == None or id == '') else id
     if name == '':
