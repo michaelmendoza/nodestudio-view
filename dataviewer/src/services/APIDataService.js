@@ -1,6 +1,6 @@
 import { fetchAPI, FetchTypes } from "./FetchUtils";
 
-export const dataUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+export const dataUrl = import.meta.env.API_URL || 'http://localhost:8001/api';
 
 const APIDataService = {
 
