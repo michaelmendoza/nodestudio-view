@@ -5,7 +5,7 @@ import pydicom
 import numpy as np
 import mapvbvd
 
-from api import models
+from dataserver.api import models
 
 files_loaded = {}
 
@@ -21,16 +21,9 @@ def remove_file(id):
     return id
 
 def get_files():
-    return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'] } for file in files_loaded.values() ]
-
-def read_npy(filepath, name: str = '', id = None):
-    id = uuid.uuid1().hex if (id == None or id == '') else id
-    if name == '':
-        name =  f'File {len(files_loaded)}'
-
-    # Read npy files
-    data = np.load(filepath)
-    return { 'id':id, 'path':filepath, 'name':name, 'type':'npy', 'data': data }
+    return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'], 
+              'dims':file['data']['dims'], 'shape':file['data']['shape'], 'min': file['data']['min'], 
+              'max': file['data']['max'], 'isComplex': file['data']['isComplex'] } for file in files_loaded.values() ]
 
 def read_file(filepath, name: str = '', id = None, options = models.FileDataOptions()):
     id = uuid.uuid1().hex if (id == None or id == '') else id
@@ -60,8 +53,18 @@ def read_file(filepath, name: str = '', id = None, options = models.FileDataOpti
             files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'raw data', 'data': data }
         if file_extension == '.dcm' or file_extension == '.ima':
             files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
-    
+        if file_extension == '.npy':
+            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'npy', 'data': read_npy(filepath)}
     return id
+
+def read_npy(filepath):
+    ''' Reads npy files and returns data '''
+    data = np.load(filepath)
+    sqzDims = list(range(len(data.shape)))
+    min = float(np.nanmin(np.abs(data)))
+    max = float(np.nanmax(np.abs(data)))
+    isComplex = np.iscomplexobj(data)
+    return { 'data':data, 'dims':sqzDims, 'shape':data.shape, 'min': min, 'max': max, 'isComplex': isComplex } 
 
 def read_dicom(filepath, group_by=None, sort_by=None):
     ''' Reads dicom files from a folder or single file. Groups data if group_by is set to tag in dicom header'''

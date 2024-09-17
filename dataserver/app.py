@@ -1,11 +1,10 @@
 import sys, os
 import time
-import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import routes
-from core import io, download_example_data
+from dataserver.api import routes
+from dataserver.core import io, download_example_data
 
 app = FastAPI()
 
@@ -43,7 +42,3 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response
-
-if __name__ == "__main__":       
-    download_example_data()
-    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True, workers=1)

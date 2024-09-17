@@ -3,7 +3,7 @@ import base64
 import numpy as np
 from io import BytesIO
 from PIL import Image
-from core import io, path
+from dataserver.core import io, path
 
 def get_path_query(relative_path):
     data = path.query_path(relative_path)
@@ -83,18 +83,22 @@ def get_file_preview_img(fileid, size = 128):
     ''' Generate key for preview img'''
     shape = dataset['shape']
     indices = [math.floor(s / 2) for s in shape ]
-    key = '['
-    for dim, index in enumerate(indices):
-        if dim == 1 or dim == 2:
-            key += ':'
-        else:
-            key += str(index)
-        if dim < len(indices) - 1:
-            key += ','
-    key += ']'
 
-    data = dataset['data']
-    data = eval(f'data{key}')
+    if len(indices) == 2:
+        data = dataset['data'][:,:]
+    else:
+        key = '['
+        for dim, index in enumerate(indices):
+            if dim == 1 or dim == 2:
+                key += ':'
+            else:
+                key += str(index)
+            if dim < len(indices) - 1:
+                key += ','
+        key += ']'
+
+        data = dataset['data']
+        data = eval(f'data{key}')
 
     if np.iscomplexobj(data):
         data = np.abs(data)
