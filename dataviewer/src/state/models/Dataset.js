@@ -20,11 +20,14 @@ class Dataset {
         }
         this.viewMode = '2D View';
 
-        this.indices = [0,0,0];
-        this.maxIndices = [1,1,1];
-
-        this.key = '[0,:,:]';
-        this.dims = "['Sli','Lin','Col']";
+        this.shape = file.shape;
+        this.ndim = this.shape.length;
+        this.indices = this.shape?.map(s => Math.floor(s / 2));
+        this.maxIndices = this.shape.map(s => s - 1);
+        this.viewIndices = this.indices.length === 2 ? [0, 1] : [1, 2];
+        
+        this.key = generateKeyFromIndices(this.shape, this.indices, this.viewIndices);
+        this.dims = file.dims
         this.update = 0;
 
         this.contrast = new Contrast();
@@ -112,7 +115,7 @@ class Dataset {
             this.dataslices.y = await fetch(key2);
         }
         else { // 2D View
-            this.key = generateKeyFromIndices(this.metadata.shape, this.indices);
+            this.key = generateKeyFromIndices(this.metadata.shape, this.indices, this.viewIndices);
             this.dims = "['Sli','Lin','Col']";
             this.dataset = await fetch(this.key);
             this.dataslices.z = this.dataset;
