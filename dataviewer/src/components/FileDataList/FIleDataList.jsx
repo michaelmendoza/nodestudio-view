@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useAppState, ActionTypes } from '../../state';
 import Divider from '../Divider/Divider';
 import APIDataService from '../../services/APIDataService';
+import { throttle } from '../../libraries/Utils';
+import { Close } from '../Icons';
 
 const FileDataList = () => {
     
@@ -10,14 +12,12 @@ const FileDataList = () => {
     const initRef = useRef(false);
 
     useEffect(() => {
-        if(!initRef.current) {
-            fetch();
-            initRef.current = true;
-        }
+        fetchLimited();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [state.files.length]);
 
     const fetch = async () => {
+        console.log('Updating FileList') // TODO: FilePreview called too often. Should cache these previews.
         let files = await APIDataService.getFiles();
 
         // Fetch FilePreviews
@@ -31,6 +31,8 @@ const FileDataList = () => {
         dispatch({ type:ActionTypes.SET_FILES, files });
     }
 
+    const fetchLimited = () => throttle(fetch, 500, 'fetch--filedatalist');
+
     const onSelect = (file) => {
         dispatch({ type:ActionTypes.SET_ACTIVE_FILE, payload: file })
     }
@@ -41,7 +43,7 @@ const FileDataList = () => {
         const files = state.files.filter((_file) => _file.id !== file.id);
         dispatch({ type:ActionTypes.SET_FILES, files });
     }
-
+    
     return ( <div className='filedatalist'>
         
         <label className='active-file-label'> Active File:  { state.activeFile?.name ? state.activeFile?.name : 'Please load file to view.' }</label>
@@ -52,7 +54,7 @@ const FileDataList = () => {
             state.files.map((file, index) => <div key={index} className='filedata-item' onClick={() => onSelect(file)}> 
                 <img src={file.img} style={{width:'64px'}} alt='preview' />
                 <label> { file.name } </label>
-                <button className='icon-button' onClick={(e) => onCancel(e, file)}> x </button>
+                <button className='close-button icon-button' onClick={(e) => onCancel(e, file)}> <Close></Close> </button>
             </div> )
         }
     </div>

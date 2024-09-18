@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^4.11.0",
     "three": "^0.168.0"
   },
   "devDependencies": {

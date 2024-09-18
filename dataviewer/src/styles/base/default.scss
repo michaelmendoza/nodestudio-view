@@ -52,6 +52,19 @@ button {
   }
 }
 
+.button-primary {
+  margin: 1em 0 1em 0;
+  background-color: #2196F3;
+  color: #FEFEFE;
+  border: 1px solid #44444466;
+
+  &:hover, &:focus, &:active {
+      background-color: lighten($color: #2196F3, $amount: 5%);
+      color: #FEFEFE;
+      border: 1px solid #44444422;
+  }
+}
+
 .button-dark {
   color: #FEFEFE;
   background-color: #3e4451;

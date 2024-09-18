@@ -7,6 +7,14 @@
     margin-bottom: 1em;
     border-bottom: 1px solid #55555555;
 
+    span { 
+        cursor: pointer;
+    }
+
+    svg {
+        top: 2px;
+    }
+
     .path {
         margin-left: 1em;
     }

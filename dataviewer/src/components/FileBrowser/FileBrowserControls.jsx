@@ -1,18 +1,22 @@
 import './FileBrowserControls.scss';
 import { useState } from 'react';
+import { MdOutlineRefresh } from 'react-icons/md';
+import { Icons } from '../Icons';
 
-const FileBrowserControls = ({ onLoad, onRefresh, onBack }) => {
+const FileBrowserControls = ({ onLoad, onRefresh, onBack, selectedItem }) => {
     const [filter, setFilter] = useState('')
+
+    const loadButtonText = selectedItem?.type  === 'folder' ? 'Load Folder' : 'Load Data' ;
 
     return (
     <div className='file-browser-controls'>
         <div className='layout-row-center layout-space-between'>
             <div>
-                <button className='button-dark' onClick={onLoad}> Load Data in Folder </button>
+                <button className='button-primary'  onClick={onLoad}> { selectedItem ? loadButtonText : 'Load Current Folder'} </button>
             </div>
-            <div className='controls-group layout-row'>
-                <button className='button-icon' onClick={onRefresh}> <i className='material-icons'>refresh</i> </button>
-                <button className='button-icon' onClick={onBack}> <i className='material-icons'>expand_less</i> </button>
+            <div className='controls-group'>
+                <button className='button-icon' onClick={onRefresh}> <MdOutlineRefresh></MdOutlineRefresh> </button>
+                <button className='button-icon' onClick={onBack}> <Icons.FileBrowser.Back/> </button>
             </div>
         </div>
 

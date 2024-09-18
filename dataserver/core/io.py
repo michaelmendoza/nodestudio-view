@@ -4,6 +4,7 @@ import uuid
 import pydicom
 import numpy as np
 import mapvbvd
+from pathlib import Path
 
 from dataserver.api import models
 
@@ -29,6 +30,11 @@ def read_file(filepath, name: str = '', id = None, options = models.FileDataOpti
     id = uuid.uuid1().hex if (id == None or id == '') else id
     if name == '':
         name =  f'File {len(files_loaded)}'
+
+    # Normalize filepath
+    filepath = os.path.normpath(filepath)
+    filepath = filepath.split(os.sep)
+    filepath = Path(os.path.join(Path.cwd(), *filepath))
 
     ''' Detects valid files in filepath and reads file, and places data in io datastore '''
     if os.path.isdir(filepath):

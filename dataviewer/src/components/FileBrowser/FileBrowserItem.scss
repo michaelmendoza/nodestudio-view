@@ -11,6 +11,10 @@
         background-color: #555555;
     }
 
+    &.active {
+        background-color: #2196F3;
+    }
+
     label {
         margin: 0 0 0 1em;
         cursor: pointer;

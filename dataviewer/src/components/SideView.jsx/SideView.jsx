@@ -1,11 +1,10 @@
 import './SideView.scss';
-import { useState } from 'react';
 import Divider from '../Divider/Divider';
 import Tabs from '../Tabs/Tabs';
-import FileBrowser from '../FileBrowser/FileBrowser';
 import FileDataList from '../FileDataList/FIleDataList';
 import FileDataInfo from '../FileDataInfo/FileDataInfo';
 import FileInspector from '../FileInspector/FileInspector';
+import { FileBrowserModal } from '../FileBrowser/FileBrowserModal';
 
 const SideView = () => {
     return ( <div className="sideview">
@@ -19,12 +18,10 @@ const SideView = () => {
 }
 
 const FilesView  = () => {
-    const [showFileBroswer, setShowFileBroswer] = useState(false);
-
     return(<div>
-        <button className='button-dark' onClick={() => setShowFileBroswer(!showFileBroswer)}> { showFileBroswer ? 'Back' : 'Load New File' }</button>
+        <FileBrowserModal></FileBrowserModal>
         <Divider></Divider>
-        { showFileBroswer ? <FileBrowser></FileBrowser> : <FileDataList></FileDataList> }
+        <FileDataList></FileDataList>
     </div>)
 }
 

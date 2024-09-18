@@ -2,7 +2,7 @@ import { fetchAPI, FetchTypes } from "./FetchUtils";
 
 export const dataUrl = import.meta.env.API_URL || 'http://localhost:8001/api';
 
-const APIDataService = {
+export const APIDataService = {
 
     // ************* Files *************
 
