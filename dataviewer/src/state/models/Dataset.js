@@ -53,7 +53,8 @@ class Dataset {
             z: [this.metadata.shape[1], this.metadata.shape[2]],
             x: [this.metadata.shape[0], this.metadata.shape[1]],
             y: [this.metadata.shape[0], this.metadata.shape[2]],
-            lightbox: [this.metadata.shape[1], this.metadata.shape[2]]
+            lightbox: [this.metadata.shape[1], this.metadata.shape[2]], 
+            '2d': [this.metadata.shape[0], this.metadata.shape[1]]
         }[datasliceKey]);
 
         return sliceShape;
@@ -64,7 +65,8 @@ class Dataset {
             z: this.indices[0],
             y: this.indices[2],
             x: this.indices[1],
-            lightbox: this.indices[0]
+            lightbox: this.indices[0],
+            '2d': 1
         }[datasliceKey]);
 
         return depth;

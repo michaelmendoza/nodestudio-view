@@ -117,7 +117,8 @@ class Viewer {
         if (!pointerUV) return;
 
         // Get pointer pixel (x, y)
-        const sliceShape = this.dataset.getSliceShape(this.datasliceKey);
+        const datasliceKey = this.dataset.ndim === 2 ? '2d' : this.datasliceKey;
+        const sliceShape = this.dataset.getSliceShape(datasliceKey);
         const sizeX = sliceShape[1]; 
         const sizeY = sliceShape[0];
         this.pointerPixel.x = Math.floor(pointerUV.x * sizeX);

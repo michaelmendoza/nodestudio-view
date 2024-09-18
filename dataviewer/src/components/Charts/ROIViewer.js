@@ -13,18 +13,20 @@ class ROIViewer {
         // Note: Dataset shape -> [depth, height, width] and ROI texture needs -> [hieght, width, depth]
         const shape = this.dataset.metadata.shape; // i.e. [160, 640, 640]
         this.shape = [...shape];
-
-        if(shape[2] === undefined)  {
-            shape[2] = 1;
-            return;
+        
+        let length;
+        if (this.shape.length === 2) {
+            length = this.shape[0] * this.shape[1]
+        }
+        else {
+            // [depth, height, width] --> [depth, width, height]
+            this.shape[0] = shape[1];
+            this.shape[1] = shape[2];
+            this.shape[2] = shape[0];
+            length = this.shape[0] * this.shape[1] * this.shape[2]; 
         }
 
-        this.shape[0] = shape[1];
-        this.shape[1] = shape[2];
-        this.shape[2] = shape[0];
-
         // Initalize ROI layer        
-        const length = this.shape[0] * this.shape[1] * this.shape[2]; 
         this.roi = new Uint8Array(length);
     }
 

@@ -79,8 +79,9 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
     if(viewMode === '2D View') depth = dataset.indices[0];
     if(viewMode === '3D View') depth = dataset.getSliceDepth(viewport.datasliceKey);
     if(viewMode === 'Lightbox') depth = viewport.pointerTargetROI.depth;
-    const datasliceKey = viewport.datasliceKey;
-
+    const is2D = dataset.ndim === 2;
+    const datasliceKey = is2D ? '2d' : viewport.datasliceKey;
+    
     const value = 255;
     const brush = ROIOptions.brush;
     const height = roi.shape[0];
@@ -112,6 +113,9 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
     points.forEach((point) => {
 
         let index = 0;
+        if (datasliceKey === '2d') {
+            index = point.x * dx + point.y * dy;
+        }
         if (datasliceKey === 'z' || datasliceKey === 'lightbox') {
             index = point.x * dx + point.y * dy + point.z * dz;
         }
