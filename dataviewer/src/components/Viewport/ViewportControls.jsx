@@ -10,7 +10,10 @@ const ViewportControls = ({ view, onUpdate, datasliceKey = 'z' }) => {
     const maxIndices = state.activeDataset ? state.activeDataset.maxIndices : [1,1,1];
 
     let viewIndices;
-    if (datasliceKey === 'x') {
+    if (view?.dataset?.ndim === 2) {
+        viewIndices = [0, 1];
+    }
+    else if (datasliceKey === 'x') {
         viewIndices = [0, 2];
     }
     else if (datasliceKey === 'y') {
