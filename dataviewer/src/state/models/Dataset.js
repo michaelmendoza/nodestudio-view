@@ -2,7 +2,7 @@ import { generateDefaultIndices, generateKeyFromIndices } from "../../libraries/
 import { decodeDataset, scaleDataset } from "../../libraries/Data";
 import APIDataService from "../../services/APIDataService";
 import Contrast from './Contrast';
-import ROIViewer from "../../components/Charts/ROIViewer";
+import ROIViewer from "./ROIViewer";
 
 export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 
