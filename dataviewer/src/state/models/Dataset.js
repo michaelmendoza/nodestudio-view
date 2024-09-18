@@ -9,7 +9,7 @@ export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 class Dataset {
 
     constructor(file) {
-        this.file = file;
+        this.file = file; // TODO: Refactor and combine file and metadata into one object
         this.metadata = null;
         this.dataset = null; // TODO: Refactor to dataslice 
         this.dataslices = {

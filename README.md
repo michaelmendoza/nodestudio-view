@@ -20,12 +20,14 @@ A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
 * [x] Fix Query data value on hover on point - for sag, cor slices
 * [x] Fix GridBox for 3D View
 * [x] Depth -> Multidimenstional includes all dims 
+* [x] Read npy files (python data with numpy arrays)
+* [ ] Persistent ROI data. ROI data stored on server and loaded on startup
 * [ ] Multiclass Segmenation
 * [ ] Read nifty file
 * [ ] Compare multiple segmenations
 * [ ] Line View: Line Graph from 2D Graph View
 * [ ] Import ROI data
-* [ ] Read png images, and python data .npy files
+* [ ] Read png images
 * [ ] Fix ROI viewing for sag, cor slices
 * [ ] Lightbox for raw data 
 * [ ] Run custom code -> View data output 
@@ -35,3 +37,4 @@ A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
 * [ ] Measurement tools
 * [ ] ChartControl: Added Slices option
 * [ ] View Img, Complex, Mag, Phase of data 
+* [ ] UI Update with draggable Control Bar
