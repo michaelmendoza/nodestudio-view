@@ -1,3 +1,4 @@
+import uuid
 import numpy as np
 from dataserver.core.cache import CacheManager
 
@@ -10,11 +11,13 @@ class RoiData:
 
 class Dataset:
 
-    def __init__(self, file):
-        self.id = file.id
+    def __init__(self, file, data, metadata):
+        self.id = id = uuid.uuid1().hex if (file.id == None or file.id == '') else id
+        # file is a dict includes path, name, type
         self.file = file
-        self.metadata = None
-        self.data = None
+        # metadata is a dict includes ndim, dims,shape, min, max, isComplex
+        self.metadata = metadata
+        self.data = data
         self.roi = None
 
         self.shape = file.shape
