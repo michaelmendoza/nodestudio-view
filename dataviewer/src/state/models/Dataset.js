@@ -20,11 +20,11 @@ class Dataset {
         }
         this.viewMode = '2D View';
 
-        this.shape = file.shape;
-        this.ndim = this.shape.length;
-        this.indices = this.shape?.map(s => Math.floor(s / 2));
-        this.maxIndices = this.shape.map(s => s - 1);
-        this.viewIndices = this.indices.length === 2 ? [0, 1] : [1, 2];
+        this.ndim = 0;
+        this.shape = [];
+        this.indices = []
+        this.maxIndices = []
+        this.viewIndices = [0, 1];
         
         this.key = generateKeyFromIndices(this.shape, this.indices, this.viewIndices);
         this.dims = file.dims
@@ -85,8 +85,11 @@ class Dataset {
     /** Fetches Metadata from API */
     fetchMetadata = async () => {
         this.metadata = await APIDataService.getFileMetadata(this.file.id);
-        this.indices = generateDefaultIndices(this.metadata.shape);
+        this.ndim = this.metadata.shape.length;
+        this.shape = this.metadata.shape;
+        this.indices = generateDefaultIndices(this.shape);
         this.maxIndices = this.metadata.shape.map((value) => value - 1);
+        this.viewIndices = this.indices.length === 2 ? [0, 1] : [1, 2];
     }
 
     /** Fetches Dataset from API */

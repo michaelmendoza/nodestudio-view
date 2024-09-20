@@ -1,188 +1,177 @@
 import os
-import glob
 import uuid
-import pydicom
-import numpy as np
-import mapvbvd
 from pathlib import Path
+from typing import List, Dict, Any, Optional
+import glob
+
+import numpy as np
+import pydicom
+import mapvbvd
 
 from dataserver.api import models
+from dataserver.core.dataset import Dataset, DatasetCache
 
-files_loaded = {}
+def get_files() -> List[Dict[str, Any]]:
+    """Retrieve all loaded files."""
+    return [dataset.file for dataset in DatasetCache.values()]
 
-def get_filedata(id):
-    ''' Retrieves file data from files_loaded cache. '''
-    if(id in files_loaded):
-        return files_loaded[id]['data']
+def remove_file(file_id: str) -> str:
+    """Remove file data from DatasetCache."""
+    DatasetCache.remove(file_id)
+    return file_id
 
-def remove_file(id):
-    ''' Removes file data from file_loaded cache '''
-    if(id in files_loaded):
-        del files_loaded[id]
-    return id
+def read_file(filepath: str, name: str = '', file_id: Optional[str] = None, options: models.FileDataOptions = models.FileDataOptions()) -> str:
+    """Read file and store in DatasetCache."""
+    file_id = file_id or str(uuid.uuid1())
+    name = name or f'File {len(DatasetCache.keys())}'
+    
+   # Normalize filepath
+    path = os.path.normpath(filepath)
+    path = path.split(os.sep)
+    path = Path(os.path.join(Path.cwd(), *path))
 
-def get_files():
-    return [ { 'id':file['id'], 'path':file['path'], 'name':file['name'], 'type':file['type'], 
-              'dims':file['data']['dims'], 'shape':file['data']['shape'], 'min': file['data']['min'], 
-              'max': file['data']['max'], 'isComplex': file['data']['isComplex'] } for file in files_loaded.values() ]
-
-def read_file(filepath, name: str = '', id = None, options = models.FileDataOptions()):
-    id = uuid.uuid1().hex if (id == None or id == '') else id
-    if name == '':
-        name =  f'File {len(files_loaded)}'
-
-    # Normalize filepath
-    filepath = os.path.normpath(filepath)
-    filepath = filepath.split(os.sep)
-    filepath = Path(os.path.join(Path.cwd(), *filepath))
-
-    ''' Detects valid files in filepath and reads file, and places data in io datastore '''
-    if os.path.isdir(filepath):
-        # Read raw data files in folder (load one dataset per file)
-        filepath = os.path.join(filepath, '') # Added ending slash if needed
-        paths = glob.glob(filepath + '*.dat') 
-        for filename in paths:
-            id = uuid.uuid1().hex
-            data = read_rawdata(filepath, options.datatype, options.doChaAverage, options.doChaSOSAverage, options.doAveAverage)
-            files_loaded[id] = { 'id':id, 'path':filename, 'name':name, 'type':'raw data', 'data': data } 
-
-        # Read raw data files in folder (load one dataset/datagroup per folder)
-        paths = glob.glob(filepath + '*.dcm')        
-        paths.extend(glob.glob(filepath + '*.ima'))
-        if len(paths) > 0:
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
+    if os.path.isdir(path):
+        read_directory(path, name, options)
     else:
-        # Check for file extension and read dicom / raw data files
-        filename, file_extension = os.path.splitext(filepath)
-        if file_extension == '.dat':
-            data = read_rawdata(filepath, options.datatype, options.doChaAverage, options.doChaSOSAverage, options.doAveAverage)
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'raw data', 'data': data }
-        if file_extension == '.dcm' or file_extension == '.ima':
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'dicom', 'data': read_dicom(filepath)}  
-        if file_extension == '.npy':
-            files_loaded[id] = { 'id':id, 'path':filepath, 'name':name, 'type':'npy', 'data': read_npy(filepath)}
-    return id
+        read_single_file(path, name, file_id, options)
 
-def read_npy(filepath):
-    ''' Reads npy files and returns data '''
+    return file_id
+
+def read_directory(path: Path, name: str, options: models.FileDataOptions) -> None:
+    """Read all valid files in a directory."""
+    # Check for .dat files
+    dat_files = list(path.glob('*.dat'))
+    for dat_file in dat_files:
+        read_single_file(dat_file, name, str(uuid.uuid1()), options)
+
+    # Check for .npy files
+    npy_files = list(path.glob('*.npy'))
+    for npy_file in npy_files:
+        read_single_file(npy_file, name, str(uuid.uuid1()), options)
+
+    # Check for DICOM files (.dcm and .ima)
+    dicom_files = list(path.glob('*.dcm')) + list(path.glob('*.ima'))
+    if dicom_files:
+        read_dicom_group(path, name, str(uuid.uuid1()))
+
+def read_single_file(path: Path, name: str, file_id: str, options: models.FileDataOptions) -> None:
+    """Read a single file based on its extension."""
+    file_type_handlers = {
+        '.dat': lambda: read_rawdata(str(path), options.datatype, options.doChaAverage, options.doChaSOSAverage, options.doAveAverage),
+        '.npy': lambda: read_npy(str(path)),
+        '.dcm': lambda: read_dicom([str(path)]),
+        '.ima': lambda: read_dicom([str(path)])
+    }
+
+    handler = file_type_handlers.get(path.suffix)
+    if handler:
+        data = handler()
+        create_and_cache_dataset(file_id, str(path), name, path.suffix[1:], data)
+
+def read_dicom_group(path: Path, name: str, file_id: str) -> None:
+    """Read a group of DICOM files from a directory."""
+    dicom_files = sorted(glob.glob(str(path / '*.dcm')) + glob.glob(str(path / '*.ima')))
+    if dicom_files:
+        data = read_dicom(dicom_files)
+        create_and_cache_dataset(file_id, str(path), name, 'dicom', data)
+
+def create_and_cache_dataset(file_id: str, path: str, name: str, file_type: str, data: Dict[str, Any]) -> None:
+    """Create a Dataset object and store it in the DatasetCache."""
+    file_info = {'id': file_id, 'path': path, 'name': name, 'type': file_type}
+    metadata = {
+        'dims': data['dims'],
+        'shape': data['shape'],
+        'min': data['min'],
+        'max': data['max'],
+        'isComplex': data['isComplex']
+    }
+    dataset = Dataset(file_info, data['data'], metadata)
+    DatasetCache.set(file_id, dataset)
+
+def read_npy(filepath: str) -> Dict[str, Any]:
+    """Read NPY file and return data dictionary."""
     data = np.load(filepath)
-    sqzDims = list(range(len(data.shape)))
-    min = float(np.nanmin(np.abs(data)))
-    max = float(np.nanmax(np.abs(data)))
-    isComplex = np.iscomplexobj(data)
-    return { 'data':data, 'dims':sqzDims, 'shape':data.shape, 'min': min, 'max': max, 'isComplex': isComplex } 
+    return {
+        'data': data,
+        'dims': list(range(len(data.shape))),
+        'shape': data.shape,
+        'min': float(np.nanmin(np.abs(data))),
+        'max': float(np.nanmax(np.abs(data))),
+        'isComplex': np.iscomplexobj(data)
+    }
 
-def read_dicom(filepath, group_by=None, sort_by=None):
-    ''' Reads dicom files from a folder or single file. Groups data if group_by is set to tag in dicom header'''
+def read_dicom(filepaths: List[str]) -> Dict[str, Any]:
+    """Read DICOM file(s) and return data dictionary."""
+    dicom_slices = [pydicom.dcmread(filepath, force=True) for filepath in filepaths]
+    dicom_slices.sort(key=lambda x: x.InstanceNumber)
 
-    # Get filenames and sort alphabetically
-    if os.path.isdir(filepath):
-        paths = glob.glob(filepath + '*.dcm')        # add .dcm files
-        paths.extend(glob.glob(filepath + '*.ima'))  # add .ima files
-    elif os.path.isfile(filepath):
-        paths = [filepath]
-    else:
-        raise IOError(f"No directory or file found: {filepath}")
-    paths = sorted(paths)
+    # Assume all slices have the same dimensions
+    slice_shape = dicom_slices[0].pixel_array.shape
+    volume_shape = (len(dicom_slices),) + slice_shape
+    data = np.zeros(volume_shape, dtype=dicom_slices[0].pixel_array.dtype)
 
-    # Read dicom files
-    headers = {}
-    for idx, path in enumerate(paths):
-        dicom = pydicom.dcmread(path, force=True)
+    for i, dicom_slice in enumerate(dicom_slices):
+        data[i, :, :] = dicom_slice.pixel_array
 
-        # Group dicoms by group_by tag
-        if group_by:
-            group_key = dicom.EchoNumbers
-        else:
-            group_key = 0
+    return {
+        'data': data,
+        'dims': ['Sli', 'Lin', 'Col'],
+        'shape': data.shape,
+        'min': float(np.nanmin(np.abs(data))),
+        'max': float(np.nanmax(np.abs(data))),
+        'isComplex': np.iscomplexobj(data)
+    }
 
-        if group_key in headers:
-            headers[group_key].append(dicom)
-        else:
-            headers[group_key] = [dicom]
-
-    # TODO: sort_by tag after group_by
-
-    # For each datagroup item - Create a dataset
-    datagroup = []
-    for key in headers.keys():
-        depth = len(headers[key])
-        height = headers[key][0].pixel_array.shape[0]
-        width = headers[key][0].pixel_array.shape[1]
-
-        # Create data array from dicoms            
-        data = np.zeros((depth, height, width), dtype='uint16')
-        for idx, header in enumerate(headers[key]):
-            data[idx,:,:] = header.pixel_array
-
-        # Create datasets
-        min = float(np.nanmin(np.abs(data)))
-        max = float(np.nanmax(np.abs(data)))
-        isComplex = np.iscomplexobj(data)
-        dataset = { 'data': data, 'dims': ['Sli', 'Lin', 'Col'], 'shape': data.shape, 'min': min, 'max': max, 'isComplex': isComplex }
-        datagroup.append(dataset)
-
-    if len(datagroup) == 1:
-        return datagroup[0]
-    else:
-        return datagroup
-
-def read_rawdata(filepath, datatype='image', doChaAverage = True, doChaSOSAverage = False, doAveAverage = True):
-    ''' Reads rawdata files and returns NodeDataset '''
-
+def read_rawdata(filepath: str, datatype: str = 'image', doChaAverage: bool = True, doChaSOSAverage: bool = False, doAveAverage: bool = True) -> Dict[str, Any]:
+    """Read raw data file and return data dictionary."""
     twixObj = mapvbvd.mapVBVD(filepath)
-    sqzDims = twixObj.image.sqzDims    
     twixObj.image.squeeze = True
-
     data = twixObj.image['']
-    # Move Lin be first index
+    sqzDims = twixObj.image.sqzDims.copy()  # Create a copy to modify
+
+    # Move Lin to be first index
     linIndex = sqzDims.index('Lin')
     data = np.moveaxis(data, linIndex, 0)
     sqzDims.insert(0, sqzDims.pop(linIndex))
 
+    # Process data based on options
     if doAveAverage and 'Ave' in sqzDims:
-        chaIndex = sqzDims.index('Ave')
-        data = np.mean(data, axis=chaIndex)
-        sqzDims.pop(chaIndex)
-                
+        ave_index = sqzDims.index('Ave')
+        data = np.mean(data, axis=ave_index)
+        sqzDims.pop(ave_index)
+
     if 'Par' in sqzDims:
-        sliceIndex = sqzDims.index('Par')
-        data = np.moveaxis(data, sliceIndex, 0)
-        sqzDims.insert(0, sqzDims.pop(sliceIndex))
-        is3D = True
-    else:
-        is3D = False
+        slice_index = sqzDims.index('Par')
+        data = np.moveaxis(data, slice_index, 0)
+        sqzDims.insert(0, sqzDims.pop(slice_index))
 
     if datatype == 'image':
-        if is3D:
+        if 'Par' in sqzDims:
             data = np.fft.fftshift(np.fft.ifftn(np.fft.fftshift(data, axes=(0,1,2))))
         else:
             data = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(data, axes=(0, 1)), axes=(0, 1)), axes=(0, 1))
-    else: # datatype is kspace
-        pass
 
     if (doChaAverage or doChaSOSAverage) and 'Cha' in sqzDims:
-        chaIndex = sqzDims.index('Cha')
-
+        cha_index = sqzDims.index('Cha')
         if doChaAverage:
-            data = np.mean(data, axis=chaIndex)
+            data = np.mean(data, axis=cha_index)
         elif doChaSOSAverage:
-            data = np.sqrt(np.sum(data**2, axis=(chaIndex)))
-
-        sqzDims.pop(chaIndex)
+            data = np.sqrt(np.sum(data**2, axis=cha_index))
+        sqzDims.pop(cha_index)
 
     if 'Sli' in sqzDims:
-        sliceIndex = sqzDims.index('Sli')
-        data = np.moveaxis(data, sliceIndex, 0)
-        sqzDims.insert(0, sqzDims.pop(sliceIndex))
+        slice_index = sqzDims.index('Sli')
+        data = np.moveaxis(data, slice_index, 0)
+        sqzDims.insert(0, sqzDims.pop(slice_index))
     else:
         sqzDims.insert(0, 'Sli')
         data = data[np.newaxis, ...]
 
-
-    min = float(np.nanmin(np.abs(data)))
-    max = float(np.nanmax(np.abs(data)))
-    isComplex = np.iscomplexobj(data)
-
-    header =  twixObj.hdr
-    return { 'data':data, 'dims':sqzDims, 'shape':data.shape, 'min': min, 'max': max, 'isComplex': isComplex } 
+    return {
+        'data': data,
+        'dims': sqzDims,
+        'shape': data.shape,
+        'min': float(np.nanmin(np.abs(data))),
+        'max': float(np.nanmax(np.abs(data))),
+        'isComplex': np.iscomplexobj(data)
+    }

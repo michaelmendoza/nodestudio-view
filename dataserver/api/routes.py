@@ -77,12 +77,28 @@ async def get_path_query(path: str):
 @handle_exception
 async def export_roi_data(data: models.ROIData):
     ''' Exports ROI Data '''
-    data = controllers.export_roi_data(data.roi_data, data.shape)
-    return { 'message': 'Exported ROI Data into roi_images.zip file.', 'data': data }
+    message = controllers.export_roi_data_old(data.roi_data, data.shape)
+    return { 'message': 'Exported ROI Data into roi_images.zip file.', 'data': message }
 
 @router.get("/roi/download")
 async def download():
     filepath = './roi/roi_images.zip'
     return FileResponse(filepath,  media_type="application/octet-stream", filename='roi_images.zip')
     
-    
+@router.get("/roi/mask/slice")
+async def get_roi_mask_slice(id: str, key: str) -> Dict[str, Any]:
+    """Get ROI mask slice for the given file id and key."""
+    data = controllers.get_roi_mask_slice(id, key)
+    return { 'message': 'Retrieved ROI mask slice', 'data': data }
+
+@router.post("/roi/mask")
+async def set_roi_mask(id: str, mask: List[List[bool]]) -> Dict[str, Any]:
+    """Set ROI mask for the given file id."""
+    controllers.set_roi_mask(id, mask)
+    return { 'message': 'Set ROI mask', 'data': None }
+
+@router.get("/roi/statistics")
+async def get_roi_statistics(id: str) -> Dict[str, Any]:
+    """Get ROI statistics for the given file id."""
+    data = controllers.get_roi_statistics(id)
+    return { 'message': 'Retrieved ROI statistics', 'data': data }
