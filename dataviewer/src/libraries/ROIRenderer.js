@@ -79,9 +79,10 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
     if(viewMode === '2D View') depth = dataset.indices[0];
     if(viewMode === '3D View') depth = dataset.getSliceDepth(viewport.datasliceKey);
     if(viewMode === 'Lightbox') depth = viewport.pointerTargetROI.depth;
+    
     const is2D = dataset.ndim === 2;
     const datasliceKey = is2D ? '2d' : viewport.datasliceKey;
-    
+
     const value = 255;
     const brush = ROIOptions.brush;
     const height = roi.shape[0];
@@ -144,6 +145,13 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
         viewport.roi_mesh_lightbox[depth].material.uniforms[ "diffuse" ].value = texture;
         viewport.roi_mesh_lightbox[depth].material.uniforms[ "depth" ].value = depth;
     }
+
+    // Update ROI mask in dataserver TODO: Test and add thottle/debounce
+    updateROIMask = () => {
+        roi_update = points.map((point) => is2D ? [point.z, point.y,] : [point.z, point.y, point.x]);
+        APIDataService.updateROIMask(dataset.file.id, roi_update, true); // TODO: Add add option for brush/erase
+    }
+    throttle(updateROIMask, 1000, 'ROI-Update');
 }
 
 const create2DTexture = (data, shape) => {

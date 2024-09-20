@@ -97,6 +97,12 @@ async def set_roi_mask(id: str, mask: List[List[bool]]) -> Dict[str, Any]:
     controllers.set_roi_mask(id, mask)
     return { 'message': 'Set ROI mask', 'data': None }
 
+@router.post("/roi/mask/update")
+async def update_roi_mask(id: str, indices: List[List[int]], add: bool = True) -> Dict[str, Any]:
+    """Add or remove points from the ROI mask for the given file id."""
+    controllers.update_roi_mask(id, indices, add)
+    return { 'message': 'Added to ROI mask', 'data': None }
+
 @router.get("/roi/statistics")
 async def get_roi_statistics(id: str) -> Dict[str, Any]:
     """Get ROI statistics for the given file id."""

@@ -60,6 +60,13 @@ def set_roi_mask(fileid: str, mask: np.ndarray) -> None:
         raise ValueError(f"Dataset with id {fileid} not found")
     dataset.roi.set_mask(mask)
 
+def update_roi_mask(fileid: str, indices: List[List[int]], add: bool = True) -> None:
+    """Add or remove points from the ROI mask for a specific file."""
+    dataset = DatasetCache.get(fileid)
+    if not dataset:
+        raise ValueError(f"Dataset with id {fileid} not found")
+    dataset.roi.update_mask(indices, add)
+
 def get_roi_statistics(fileid: str) -> Dict[str, Any]:
     """Retrieve ROI statistics for a specific file."""
     dataset = DatasetCache.get(fileid)

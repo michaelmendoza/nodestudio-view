@@ -21,6 +21,24 @@ class RoiData:
         else:
             raise ValueError("Mask shape does not match dataset shape")
 
+    def update_mask(self, indices: List[List[int]], add: bool = True) -> None:
+        """ Add or remove points from the mask based on the provided indices. """
+        if not indices:
+            return
+
+        # Check dimensionality
+        point_dim = len(indices[0])
+        if point_dim not in (2, 3) or point_dim != len(self.shape):
+            raise ValueError(f"Indices dimensionality ({point_dim}) does not match mask dimensionality ({len(self.shape)})")
+
+        # Create a boolean array for indexing
+        idx = tuple(np.array(indices).T)
+
+        if add:
+            self.mask[idx] = True
+        else:
+            self.mask[idx] = False
+
     def get_slice(self, key: str) -> Dict[str, Any]:
         """Get a slice of the mask, pack it into bits, and encode it."""
         sliced_mask = eval(f'self.mask{key}')
@@ -92,7 +110,7 @@ class Dataset:
             'max': float(np.max(roi_data)),
             'histogram': (np.histogram(roi_data, bins=10)[0].tolist(), np.histogram(roi_data, bins=10)[1].tolist())
         }
-
+    
     def export_roi_data(self, filepath: str) -> None:
         """Export ROI data and statistics to a file."""
         roi_indices = self.roi.get_nonzero_indices()

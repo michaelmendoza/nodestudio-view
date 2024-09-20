@@ -18,6 +18,10 @@ export const APIDataService = {
 
     getFilePreview: (id, size = 128) => fetchAPI(`${dataUrl}/files/preview?id=${id}&size=${size}`, FetchTypes.GET),
 
+    // ************* ROI *************
+
+    updateROIMask: (id, indices, add = true) => fetchAPI(`${dataUrl}/roi/mask/update?id=${id}&indices=${indices}&add=${add}`, FetchTypes.POST),
+
     // ************* FileSystem Path *************
    
     getPathQuery: (path = '') => fetchAPI(`${dataUrl}/path/query?path=${path}`, FetchTypes.GET),
