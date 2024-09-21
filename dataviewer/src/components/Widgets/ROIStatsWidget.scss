@@ -1,0 +1,128 @@
+// Variables
+$bg-gray-800: #1F2937;
+$bg-gray-700: #374151;
+$text-white: #FFFFFF;
+$text-gray-400: #9CA3AF;
+$border-gray-700: #4B5563;
+$blue-500: #3B82F6;
+
+// Mixins
+@mixin flex {
+  display: flex;
+}
+
+@mixin items-center {
+  align-items: center;
+}
+
+@mixin justify-between {
+  justify-content: space-between;
+}
+
+@mixin font-semibold {
+  font-weight: 600;
+}
+
+@mixin rounded {
+  border-radius: 0.25rem;
+}
+
+@mixin rounded-lg {
+  border-radius: 0.5rem;
+}
+
+@mixin shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+// Styles
+.roi-stats-widget {
+  position: absolute;
+  background-color: $bg-gray-800;
+  border: 1px solid $border-gray-700;
+  @include rounded-lg;
+  @include shadow-lg;
+  padding: 0.5rem;
+  width: 16rem; // w-64
+  z-index: 10;
+
+  h3 { margin: 0; padding: 0 0 0 0.5rem; }
+  p { margin: 0; }
+  button { margin:0; padding: 0.25rem; border: none}
+
+  .widget-header {
+    @include flex;
+    @include items-center;
+    @include justify-between;
+    background-color: $bg-gray-700;
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+    @include rounded;
+    cursor: move;
+
+    h3 {
+      font-size: 0.75rem; // text-xs
+      @include font-semibold;
+      color: $text-white;
+    }
+
+    button {
+      color: $text-gray-400;
+      &:hover {
+        color: $text-white;
+      }
+    }
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+
+    .stat-card {
+      background-color: $bg-gray-700;
+      padding: 0.25rem;
+      @include rounded;
+      text-align: center;
+
+      p:first-child {
+        color: $text-gray-400;
+        font-size: 0.75rem; // text-xs
+      }
+
+      p:last-child {
+        color: $text-white;
+        font-size: 0.75rem; // text-xs
+        @include font-semibold;
+      }
+    }
+  }
+
+  .chart-container {
+    height: 4rem; // h-16
+  }
+}
+
+// Tooltip styles
+.custom-tooltip {
+  background-color: $bg-gray-700;
+  padding: 0.25rem;
+  @include rounded;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  p {
+    color: $text-white;
+    font-size: 0.75rem; // text-xs
+    margin: 0;
+  }
+}
+
+// Recharts overrides
+.recharts-cartesian-axis-line {
+  stroke: $border-gray-700;
+}
+
+.recharts-bar-rectangle {
+  fill: $blue-500;
+}

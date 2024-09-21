@@ -9,6 +9,7 @@ import Viewer from '../../state/models/Viewer';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import { render, updateRender } from '../../libraries/DataRenderer';
 import { renderROI } from '../../libraries/ROIRenderer';
+import { ROIStatsWidget } from '../Widgets/ROIStatsWidget';
 const Viewport = () => {
 
     const { state, dispatch } = useAppState();
@@ -126,6 +127,8 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
     return (
         <div className='view' style={style} onKeyDown={handleKeyDown} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} tabIndex="-1"> 
             <ContextMenu domElement={ref.current}></ContextMenu>
+
+            <ROIStatsWidget></ROIStatsWidget>
 
             <div className='view-pixel-info'>
                 { showPixel ? `x:${ pixel?.x } y:${ pixel?.y} value:${toNumberWithCommas(pixel?.value)}` : '' }

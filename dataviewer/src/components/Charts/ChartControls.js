@@ -17,7 +17,30 @@ export const setMouseState = (state) => {
 }
 
 export const cache = {
-    pixels : {}
+    pixels : {}, 
+    stats: {
+        size: 0,
+        mean: 0,
+        median: 0,
+        stdDev: 0,
+        min: 0,
+        max: 255,
+        histogram: Array.from({ length: 20 }, (_, i) => ({
+          bin: i * 12.75,
+          value: Math.floor(Math.random() * 100) + 10,
+        })),
+      }
+}
+
+const updateStatsCache = (stats) => {
+    cache.stats.size = stats.size;
+    cache.stats.mean = stats.mean;
+    cache.stats.median = stats.median;
+    cache.stats.stdDev = stats.stdDev;
+    cache.stats.min = stats.min;
+    cache.stats.max = stats.max;
+    cache.stats.histogram = stats.histogram;
+    console.log(stats);
 }
 
 export const updatePixelCache = (points) => {
@@ -106,7 +129,7 @@ class ChartControls {
             const indices = getPixelCache();
             const stats = await APIDataService.updateROIMask(datasetID, indices, ROIOptions.useBrush); 
             clearPixelCache();
-            console.log(stats)
+            updateStatsCache(stats);
         }
     }
 
