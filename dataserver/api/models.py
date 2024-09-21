@@ -11,3 +11,8 @@ class FileDataOptions(BaseModel):
 class ROIData(BaseModel):
     roi_data: str
     shape: List[int] = []
+
+class ROIUpdate(BaseModel):
+    id: str
+    indices: List[List[int]]
+    add: bool = True

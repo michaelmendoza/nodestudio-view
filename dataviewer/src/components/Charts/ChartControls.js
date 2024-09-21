@@ -1,5 +1,7 @@
 import { throttle } from '../../libraries/Utils';
 import { updatePixel } from '../../libraries/ROIRenderer';
+import APIDataService from '../../services/APIDataService';
+import { ROIOptions } from '../../state/models/ROI';
 
 export const STATE = {
     NONE: 0,
@@ -14,6 +16,28 @@ export const setMouseState = (state) => {
     mousestate.left = state;
 }
 
+export const cache = {
+    pixels : {}
+}
+
+export const updatePixelCache = (points) => {
+    if (points.length === 0) return;
+
+    const is2D = points[0].z === undefined;
+    points = points.map((point) => is2D ? [point.y, point.x,] : [point.z, point.y, point.x]);
+    points.forEach((point) => { 
+        const key = is2D ? point[0]+ ',' + point[1] : point[0] + ',' + point[1] + ',' + point[2];
+        cache.pixels[key] = point;
+    })
+}
+
+export const getPixelCache = () => {
+    return Object.values(cache.pixels);
+}
+
+export const clearPixelCache = () => {
+    cache.pixels = {};
+}
 class ChartControls {
 
     constructor(viewer, camera, domElement) {
@@ -66,12 +90,24 @@ class ChartControls {
 
         this.state = mousestate.left;
         if (this.state === STATE.ROI) {
-            throttle(() => updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel), 10, 'ROI-Viewer');
+            throttle(() => { 
+                const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
+                updatePixelCache(pixels);
+            }, 10, 'ROI-Viewer');
         }
     }
 
-    handleMouseUp = (event) => {
+    handleMouseUp = async(event) => {
         this.state = STATE.NONE;
+
+        // Send ROI update to dataserver and clear cache
+        if (Object.keys(cache.pixels).length > 0) {
+            const datasetID = this.viewer.dataset.file.id;
+            const indices = getPixelCache();
+            const stats = await APIDataService.updateROIMask(datasetID, indices, ROIOptions.useBrush); 
+            clearPixelCache();
+            console.log(stats)
+        }
     }
 
     onPointerDown = () => { 
@@ -87,7 +123,8 @@ class ChartControls {
             this.camera.updateProjectionMatrix();
         }
         if (this.state === STATE.ROI) {
-            updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
+            const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
+            updatePixelCache(pixels);
         }
         if (this.state === STATE.ZOOM) {
             const dz = this.sensitivity * (event.movementY + event.movementX);

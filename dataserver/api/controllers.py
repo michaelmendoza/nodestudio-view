@@ -66,6 +66,8 @@ def update_roi_mask(fileid: str, indices: List[List[int]], add: bool = True) -> 
     if not dataset:
         raise ValueError(f"Dataset with id {fileid} not found")
     dataset.roi.update_mask(indices, add)
+    stats = dataset.get_roi_statistics()
+    return stats
 
 def get_roi_statistics(fileid: str) -> Dict[str, Any]:
     """Retrieve ROI statistics for a specific file."""
@@ -74,12 +76,12 @@ def get_roi_statistics(fileid: str) -> Dict[str, Any]:
         raise ValueError(f"Dataset with id {fileid} not found")
     return dataset.get_roi_statistics()
 
-def export_roi_data(fileid: str, filepath: str) -> None:
+def export_segmented_data(fileid: str, filepath: str) -> None:
     """Export ROI data for a specific file to the given filepath."""
     dataset = DatasetCache.get(fileid)
     if not dataset:
         raise ValueError(f"Dataset with id {fileid} not found")
-    dataset.export_roi_data(filepath)
+    dataset.export_segmented_data(filepath)
 
 def export_roi_data_old(roi_data: str, shape: List[int]) -> str: 
     decoded = base64.b64decode(roi_data)

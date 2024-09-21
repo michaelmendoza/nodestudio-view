@@ -16,9 +16,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(routes.router)
+
 @app.on_event("startup")
 def load_examples():
     print('Startup!')
+
+    routes.setup_logging()
 
     filepath = os.path.join(os.getcwd(), 'data', 'examples', 'example1', '')
     example1Exists = os.path.exists(filepath)
@@ -33,7 +37,6 @@ def read_root():
     url_list = [{"path": route.path, "name": route.name} for route in app.routes]
     return {"message": "Welcome Node Studio Viewer", "routes": url_list}
 
-app.include_router(routes.router)
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):

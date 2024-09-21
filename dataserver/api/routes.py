@@ -8,12 +8,23 @@ from fastapi.responses import FileResponse
 
 from dataserver.api import controllers, models
 
+import logging
+logger = logging.getLogger(__name__)
+
+def setup_logging() -> None:
+    """Set up basic logging configuration."""
+    logging.basicConfig(level=logging.INFO,
+                        format='INFO: %(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        filename='dataviewer.log')
+
 def handle_exception(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         try:
             data = await func(*args, **kwargs)
         except Exception as e:
+            #logger.error(f"ERROR: {str(e)}")
+            #logger.exception(f"ERROR: {str(e)}")
             error_message = str(traceback.format_exc())
             print(error_message)
             raise HTTPException(status_code=500, detail = {'message':"Error", 'error':error_message })
@@ -98,13 +109,19 @@ async def set_roi_mask(id: str, mask: List[List[bool]]) -> Dict[str, Any]:
     return { 'message': 'Set ROI mask', 'data': None }
 
 @router.post("/roi/mask/update")
-async def update_roi_mask(id: str, indices: List[List[int]], add: bool = True) -> Dict[str, Any]:
+async def update_roi_mask(data: models.ROIUpdate) -> Dict[str, Any]:
     """Add or remove points from the ROI mask for the given file id."""
-    controllers.update_roi_mask(id, indices, add)
-    return { 'message': 'Added to ROI mask', 'data': None }
+    updated_stats = controllers.update_roi_mask(data.id, data.indices, data.add)
+    return { 'message': 'Added to ROI mask', 'data': updated_stats }
 
-@router.get("/roi/statistics")
+@router.get("/roi/stats")
 async def get_roi_statistics(id: str) -> Dict[str, Any]:
     """Get ROI statistics for the given file id."""
     data = controllers.get_roi_statistics(id)
+    return { 'message': 'Retrieved ROI statistics', 'data': data }
+
+@router.get("/roi/segment")
+async def export_segmented_data(id: str, filename: str) -> Dict[str, Any]:
+    """Get ROI segmented data for the given file id."""
+    data = controllers.export_segmented_data(id, filename)
     return { 'message': 'Retrieved ROI statistics', 'data': data }

@@ -111,7 +111,7 @@ class Dataset:
             'histogram': (np.histogram(roi_data, bins=10)[0].tolist(), np.histogram(roi_data, bins=10)[1].tolist())
         }
     
-    def export_roi_data(self, filepath: str) -> None:
+    def export_segmented_data(self, filepath: str) -> None:
         """Export ROI data and statistics to a file."""
         roi_indices = self.roi.get_nonzero_indices()
         roi_stats = self.get_roi_statistics()
@@ -119,6 +119,7 @@ class Dataset:
         export_data = {
             'mask': self.roi.mask,
             'indices': [i.tolist() for i in roi_indices],
+            'values': self.data[roi_indices],
             'statistics': roi_stats
         }
         

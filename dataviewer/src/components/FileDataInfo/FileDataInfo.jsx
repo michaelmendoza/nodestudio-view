@@ -106,8 +106,9 @@ const ROIControls = () => {
     const exportROIData = async () => {
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Exporting ROI Masks ...' }) });
         const data = await state.activeDataset.roi.export();
-        await APIDataService.exportROIData(data.data, data.shape);
-        APIDataService.exportDownload();
+        //await APIDataService.exportROIData(data.data, data.shape);
+        //APIDataService.exportDownload();
+        APIDataService.exportSegmentedData(state.activeDataset.file.id, 'test.npy');
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false, message: '' }) });
     }
 

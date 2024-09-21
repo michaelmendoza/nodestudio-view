@@ -11,6 +11,15 @@ package_lock.json
 /.pnp
 .pnp.js
 
+# datafiles
+*.npy
+*.dcm
+*.ima
+*.dat
+
+# logfiles
+*.log
+
 # testing
 /coverage
 

@@ -94,7 +94,7 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
     const points = [];
 
     if(brush === 1) {
-        points.push({x: p.x, y: p.y, z: depth });
+        points.push(is2D ? {x: p.x, y: p.y } : {x: p.x, y: p.y, z: depth });
     }
     if(brush >= 2) {
         for (let i = 0; i < brush * brush; i++) {
@@ -107,7 +107,7 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
             const r2 = (brush / 2)*(brush / 2)
             const isCircle = x2 + y2 <= r2
             if (isCircle)
-                points.push({x: x, y: y, z: depth });
+                points.push(is2D ? { x, y } : {x: x, y: y, z: depth });
         }
     }
 
@@ -146,12 +146,7 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
         viewport.roi_mesh_lightbox[depth].material.uniforms[ "depth" ].value = depth;
     }
 
-    // Update ROI mask in dataserver TODO: Test and add thottle/debounce
-    updateROIMask = () => {
-        roi_update = points.map((point) => is2D ? [point.z, point.y,] : [point.z, point.y, point.x]);
-        APIDataService.updateROIMask(dataset.file.id, roi_update, true); // TODO: Add add option for brush/erase
-    }
-    throttle(updateROIMask, 1000, 'ROI-Update');
+    return points;
 }
 
 const create2DTexture = (data, shape) => {
