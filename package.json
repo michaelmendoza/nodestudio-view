@@ -1,41 +1,29 @@
 {
-  "name": "3d-charts-playground",
+  "name": "dataviewer",
   "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "http-proxy-middleware": "^2.0.6",
-    "material-design-icons": "^3.0.1",
-    "node-sass": "^7.0.1",
-    "normalize.css": "^8.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "three": "^0.143.0"
-  },
+  "private": false,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "api": "python server/server.py",
-    "app": "(npm run start&) && npm run api"
+    "dev": "cd dataviewer && npm run dev",
+    "api": "python server.py",
+    "build": "cd dataviewer && npm run build",
+    "npm_install": "cd dataviewer && npm install",
+    "pip_install": "pip install -r ./dataserver/requirements.txt && pip install -r ./visualcoder/requirements-mri.txt"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "author": "Michael Mendoza <https://github.com/michaelmendoza>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michaelmendoza/dataviewer/issues"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "homepage": "https://github.com/michaelmendoza/dataviewer#readme",
+  "description": "A simple python data viewer with ROI/Segmenation tools",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelmendoza/dataviewer.git"
+  },
+  "keywords": [
+    "image",
+    "processing",
+    "dicom",
+    "mri"
+  ]
 }

@@ -1,14 +1,50 @@
 # Nodestudio View
 
-A simple medical data viewer for dicom/raw data with ROI/Segmenation tools
+A simple python data viewer with ROI/Segmenation tools
 
 ## Features
 
-- Loading dicom and raw data (from Siemens MRI scanner)
+- Can load npy, dicom and raw data (from Siemens MRI scanner)
 - Can view data in 2D, 3D View, and Lightbox modes
 - Allows for viewing slices in N-dim dataset 
 - Simple ROI tools for manual segmentation of images
 - Control Pan/Zoom/ROI select with Left Mouse. Right mouse to switch options.
+
+# Development 
+
+## Local Development
+
+Frontend javascript code located in dataviewer. Backend python server code located in dataserver.
+
+To run locally frontend: ( From project root directory )
+- Install nodejs. (Requires Node 14 or greater)
+- Setup nodejs third party packages (uses npm install)
+```
+cd dataviewer
+npm install
+```
+- To run frontend react server from dataviewer directory
+``` 
+npm run dev
+```
+
+To run locally backend api server: ( From project root directory )
+
+- Create and setup conda enviroment 
+
+> ```
+> conda create -n dataserver python=3.9
+> conda activate dataserver
+> ```
+> Then install packages with pip using requirements file 
+> ```
+> pip install -r dataserver/requirements.txt
+> ```
+
+- Run to API server
+```
+npm run api
+```
 
 ### TODO:
 

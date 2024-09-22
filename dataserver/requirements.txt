@@ -1,0 +1,20 @@
+# API Framework
+fastapi==0.103.2
+uvicorn[standard]
+
+# Data Processing and Scientific Computing
+numpy
+scipy
+matplotlib
+
+# DICOM Handling
+pydicom==2.0.0
+
+# File Handling and Compression
+gdown==4.6.0
+
+# MRI Data Handling
+pymapvbvd==0.5.2
+
+# Image Processing
+Pillow
