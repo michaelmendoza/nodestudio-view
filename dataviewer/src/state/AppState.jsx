@@ -10,8 +10,9 @@ const initialState  = {
     activeFile: null,
     datasets: {},
     activeDataset: null,
+    roiStats: new ROIStats(),
     viewMode: '2D View',
-    status: new Status()
+    status: new Status(),
 };
 
 /**

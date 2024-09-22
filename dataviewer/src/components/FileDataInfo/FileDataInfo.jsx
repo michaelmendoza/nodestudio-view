@@ -19,7 +19,7 @@ const FileDataInfo = () => {
         <ViewerOptions></ViewerOptions>
         { state.activeDataset && state.viewMode !== 'Lightbox' ? <ContrastOptions></ContrastOptions> : null }
         <ROIControls></ROIControls>
-        { state.activeDataset.file.type === 'raw data' ? <FileDataControl></FileDataControl> : null }
+        { state.activeDataset?.file?.type === 'raw data' ? <FileDataControl></FileDataControl> : null }
     </div>)
 }
 

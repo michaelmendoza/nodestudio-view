@@ -30,25 +30,6 @@ class ROIViewer {
         this.roi = new Uint8Array(length);
     }
 
-    getIndices = () => {
-        // Get non-zero indices
-        const indices = this.roi.map((value, index) => value === 0 ? null : index);
-
-        // Get x,y,z indices
-        indices.forEach((value, index) => {
-            const x = index % this.shape[1];
-            const y = Math.floor(index / this.shape[1]);
-            if (this.shape.length === 2) {
-                const z = Math.floor(index / (this.shape[1] * this.shape[2]));
-                indices[index] = { x: x, y: y, z: z }
-            }
-            else {
-                indices[index] = { x: x, y: y }
-            }
-        })
-        return indices
-    }
-
     export = async () => {
         const data = this.roi;
         const shape = this.shape;
