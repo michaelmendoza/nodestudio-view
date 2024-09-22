@@ -91,8 +91,9 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
     const dy = width;
     const dz = height * width;
 
-    const points = [];
+    let points = [];
 
+    // Add point to points array
     if(brush === 1) {
         points.push(is2D ? {x: p.x, y: p.y } : {x: p.x, y: p.y, z: depth });
     }
@@ -111,6 +112,13 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
         }
     }
 
+    // Filter points that are out of bounds
+    points = points.filter((point) => point.x >= 0 && point.y >= 0);
+    if (is2D) {
+        points = points.filter((point) => point.x < roi.shape[1] && point.y < roi.shape[0]);
+    }
+
+    // Add points to ROI
     points.forEach((point) => {
 
         let index = 0;
@@ -130,6 +138,7 @@ export const updatePixel = (viewport, dataset, viewMode, p) => {
         roi.roi[index] = ROIOptions.useBrush ? value : 0;
     })
 
+    // Update texture
     const texture = create2DTexture(roi.roi, roi.shape);
     if(dataset.viewMode === '2D View' ) {
         viewport.roi_mesh_2D.material.uniforms[ "diffuse" ].value = texture;

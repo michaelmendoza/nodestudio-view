@@ -58,7 +58,7 @@ $blue-500: #3B82F6;
     padding: 0.25rem;
     margin-bottom: 0.5rem;
     @include rounded;
-    cursor: move;
+    cursor: grab;
 
     h3 {
       font-size: 0.75rem; // text-xs

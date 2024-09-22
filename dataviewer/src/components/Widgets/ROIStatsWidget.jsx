@@ -68,9 +68,7 @@ export const ROIStatsWidget = ({ stats = defaultData, onClose }) => {
     <div className="roi-stats-widget" style={{ left: `${position.x}px`, top: `${position.y}px` }}>
       <div className="widget-header" onMouseDown={handleMouseDown}>
         <h3>ROI Statistics</h3>
-        <button onClick={onClose}>
-          <X size={14} />
-        </button>
+        { onClose ? <button onClick={onClose}> <X size={14} /> </button> : null }
       </div>
       <div className="stats-grid">
         <div className="stat-card">
