@@ -16,11 +16,11 @@ const defaultData = {
   })),
 };
 
-export const ROIStatsWidget = ({ initialData = defaultData, onClose }) => {
+export const ROIStatsWidget = ({ stats = defaultData, onClose }) => {
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [stats, setStats] = useState(initialData);
+  //const [stats, setStats] = useState(initialData);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -52,15 +52,11 @@ export const ROIStatsWidget = ({ initialData = defaultData, onClose }) => {
     };
   }, [isDragging]);
 
-  const updateStats = (newData) => {
-    setStats(newData);
-  };
-
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div className="custom-tooltip">
-          <p>{`bin: ${payload[0].payload.bin.toFixed(1)}`}</p>
+          <p>{`bin: ${payload[0].payload.bin.toFixed(0)}`}</p>
           <p>{`value: ${payload[0].value}`}</p>
         </div>
       );
@@ -83,23 +79,23 @@ export const ROIStatsWidget = ({ initialData = defaultData, onClose }) => {
         </div>
         <div className="stat-card">
           <p>Mean</p>
-          <p>{stats.mean.toFixed(1)}</p>
+          <p>{stats.mean.toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <p>Median</p>
-          <p>{stats.median.toFixed(1)}</p>
+          <p>{stats.median.toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <p>Std Dev</p>
-          <p>{stats.stdDev.toFixed(1)}</p>
+          <p>{stats.stdDev.toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <p>Min</p>
-          <p>{stats.min.toFixed(1)}</p>
+          <p>{stats.min.toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <p>Max</p>
-          <p>{stats.max.toFixed(1)}</p>
+          <p>{stats.max.toFixed(2)}</p>
         </div>
       </div>
       <div className="chart-container">

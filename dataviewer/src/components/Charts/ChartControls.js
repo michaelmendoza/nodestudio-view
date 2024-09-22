@@ -1,7 +1,8 @@
 import { throttle } from '../../libraries/Utils';
 import { updatePixel } from '../../libraries/ROIRenderer';
 import APIDataService from '../../services/APIDataService';
-import { ROIOptions } from '../../state/models/ROI';
+import { ROIOptions, ROIStats } from '../../state/models/ROI';
+import { ActionTypes, Dispatch } from '../../state';
 
 export const STATE = {
     NONE: 0,
@@ -106,7 +107,7 @@ class ChartControls {
             const indices = getPixelCache();
             const stats = await APIDataService.updateROIMask(datasetID, indices, ROIOptions.useBrush); 
             clearPixelCache();
-            //updateStatsCache(stats);
+            Dispatch({ type: ActionTypes.SET_ROISTATS, payload: new ROIStats(stats) });
         }
     }
 

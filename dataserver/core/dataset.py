@@ -99,16 +99,18 @@ class Dataset:
 
     def get_roi_statistics(self) -> Dict[str, Any]:
         """Calculate and return statistics for the ROI data."""
+        bins = 20
         roi_indices = self.roi.get_nonzero_indices()
         roi_data = self.data[roi_indices]
         
         return {
             'size': roi_data.size,
             'mean': float(np.mean(roi_data)),
+            'median': float(np.median(roi_data)),
             'std_dev': float(np.std(roi_data)),
             'min': float(np.min(roi_data)),
             'max': float(np.max(roi_data)),
-            'histogram': (np.histogram(roi_data, bins=10)[0].tolist(), np.histogram(roi_data, bins=10)[1].tolist())
+            'histogram': (np.histogram(roi_data, bins=bins)[0].tolist(), np.histogram(roi_data, bins=bins)[1].tolist())
         }
     
     def export_segmented_data(self, filepath: str) -> None:
