@@ -17,10 +17,9 @@ const defaultData = {
 };
 
 export const ROIStatsWidget = ({ stats = defaultData, onClose }) => {
-  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [position, setPosition] = useState({ x: 220, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  //const [stats, setStats] = useState(initialData);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);

@@ -40,6 +40,7 @@ class Dataset {
         await this.fetchMetadata();
         await this.fetchDataset();
         this.roi = new ROIViewer(this);
+        await this.roi.fetchROI();
     }
 
     getData = (viewKey = 'z') => {

@@ -9,7 +9,9 @@ import Viewer from '../../state/models/Viewer';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import { render, updateRender } from '../../libraries/DataRenderer';
 import { renderROI } from '../../libraries/ROIRenderer';
-import { ROIStatsWidget } from '../Widgets/ROIStatsWidget';
+import APIDataService from '../../services/APIDataService';
+import { ROIStats } from '../../state/models/ROI';
+
 const Viewport = () => {
 
     const { state, dispatch } = useAppState();
@@ -39,6 +41,9 @@ const Viewport = () => {
         dispatch({ type: ActionTypes.SET_ACTIVE_DATASET, payload: dataset });
         dispatch({ type: ActionTypes.UPDATE_DATASETS, payload: dataset });
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
+
+        const roiStats = await APIDataService.getROIStats(state.activeFile.id);
+        dispatch({ type: ActionTypes.SET_ROISTATS, payload: new ROIStats(roiStats) });
     }
 
     return (
@@ -127,8 +132,6 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
     return (
         <div className='view' style={style} onKeyDown={handleKeyDown} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} tabIndex="-1"> 
             <ContextMenu domElement={ref.current}></ContextMenu>
-
-            <ROIStatsWidget stats={state.roiStats}></ROIStatsWidget>
 
             <div className='view-pixel-info'>
                 { showPixel ? `x:${ pixel?.x } y:${ pixel?.y} value:${toNumberWithCommas(pixel?.value)}` : '' }

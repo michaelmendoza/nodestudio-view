@@ -1,4 +1,4 @@
-import AppState from './AppState';
-export const AppContext = AppState.AppContext;
+import _AppState from './AppState';
+export const AppState = _AppState;
 export { ActionTypes } from './AppReducers';
-export { useAppState, getAppState, Dispatch } from './AppState';
+export { AppStateProvider, AppContext, useAppState, getAppState, Dispatch } from './AppState';

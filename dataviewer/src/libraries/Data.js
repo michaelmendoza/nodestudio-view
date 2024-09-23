@@ -75,3 +75,94 @@ export const datasetToPointCloud = (pixelArray, shape) => {
 
     return pointCloud;
 }
+
+/** Unpacks the bit-packed base64 string into a uint8 array */
+export const unpackBitPackedBase64 = (packedData, originalShape) => {
+
+    // Decode the base64 string to an array of bytes
+    const binaryString = atob(packedData);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Unpack the bits
+    const unpacked = new Uint8Array(bytes.length * 8);
+    for (let i = 0; i < bytes.length; i++) {
+        for (let j = 0; j < 8; j++) {
+            unpacked[i * 8 + j] = (bytes[i] & (1 << (7 - j))) ? 1 : 0;
+        }
+    }
+
+    // Trim the unpacked array to the original shape
+    const totalPixels = originalShape.reduce((a, b) => a * b, 1);
+    const mask = unpacked.slice(0, totalPixels);
+
+    return mask;
+}
+
+/** Reshape the 1D array into the original shape -> [depth][height * width] */
+export const reshape1DArray = (array, shape) => {
+    const result = [];
+    let index = 0;
+
+    const recurse = (dimensions) => {
+        if (dimensions.length === 1) {
+            return array.slice(index, index += dimensions[0]);
+        }
+        
+        const dim = dimensions[0];
+        const rest = dimensions.slice(1);
+        const newArray = [];
+
+        for (let i = 0; i < dim; i++) {
+            newArray.push(recurse(rest));
+        }
+        return newArray;
+    }
+
+    return recurse(shape);
+}
+
+/** Swaps the axes of an array. The new axis order is specified as an array of integers from 0 to 2. */
+export const swapArrayAxes = (inputArray, inputShape, newAxisOrder) => {
+    // Validate input
+    if (inputShape.length !== 3 || newAxisOrder.length !== 3) {
+        throw new Error('Input shape and new axis order must be 3-dimensional');
+    }
+    if (!newAxisOrder.every(axis => axis >= 0 && axis < 3)) {
+        throw new Error('New axis order must contain values 0, 1, and 2');
+    }
+    if (new Set(newAxisOrder).size !== 3) {
+        throw new Error('New axis order must contain each of 0, 1, and 2 exactly once');
+    }
+
+    const outputShape = newAxisOrder.map(axis => inputShape[axis]);
+    const outputArray = new Uint8Array(inputArray.length);
+
+    const [dim0, dim1, dim2] = inputShape;
+    const [newDim0, newDim1, newDim2] = outputShape;
+
+    for (let i = 0; i < dim0; i++) {
+        for (let j = 0; j < dim1; j++) {
+            for (let k = 0; k < dim2; k++) {
+                // Calculate input index
+                const inputIndex = (i * dim1 * dim2) + (j * dim2) + k;
+
+                // Calculate output index based on new axis order
+                const newCoords = [i, j, k];
+                const outputIndex = (newCoords[newAxisOrder[0]] * newDim1 * newDim2) +
+                                    (newCoords[newAxisOrder[1]] * newDim2) +
+                                    newCoords[newAxisOrder[2]];
+
+                // Copy the value
+                outputArray[outputIndex] = inputArray[inputIndex];
+            }
+        }
+    }
+
+    return {
+        array: outputArray,
+        shape: outputShape
+    };
+}

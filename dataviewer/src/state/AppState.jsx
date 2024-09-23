@@ -25,7 +25,7 @@ let appStore = {
 /**
  * AppContext using React Context API
  */
-const AppContext = createContext({
+export const AppContext = createContext({
     state: initialState,
     dispatch: () => null,
   });
@@ -33,7 +33,7 @@ const AppContext = createContext({
 /**
  * AppState Provider allows consuming components to subscribe to context changes in AppState
  */
-const AppStateProvider = ({ children }) => {
+export const AppStateProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AppReducers, initialState);
 
     appStore.state = state;
@@ -48,7 +48,7 @@ const AppStateProvider = ({ children }) => {
 
 /** AppState Hook */
 export const useAppState = () => {
-    return useContext(AppState.AppContext);
+    return useContext(AppContext);
 }
 
 /** Retrives AppState */
@@ -61,5 +61,5 @@ export const Dispatch = (action) => {
     return appStore.dispatch(action);
 }
 
-const AppState = { AppStateProvider, AppContext };
+const AppState = { AppStateProvider, AppContext, useAppState, getAppState, Dispatch };
 export default AppState;

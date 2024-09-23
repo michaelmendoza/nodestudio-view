@@ -48,6 +48,12 @@ out vec4 outColor;
 
 void main() {
     vec4 color = texture( diffuse, vec3( vUv, depth ) );
-    outColor = vec4( color.r, color.g, color.b, 0.4 );
+
+    if (color.r > 0.0) {
+        outColor = vec4( 255, 0, 0, 0.4 );
+    }
+    else {
+        outColor = vec4( 0, 0, 0, 0 );
+    }
 }
 `;

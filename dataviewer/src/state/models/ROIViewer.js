@@ -1,33 +1,35 @@
-import { pixelArrayToBase64 } from '../../libraries/Data';
+import { pixelArrayToBase64, reshape1DArray, swapArrayAxes, unpackBitPackedBase64 } from '../../libraries/Data';
+import APIDataService from '../../services/APIDataService';
 
 class ROIViewer {
     constructor(dataset) {
         this.dataset = dataset;
         this.roi = null;
         this.shape  = null; 
-
-        this.init();
     }
 
-    init = () => {
-        // Note: Dataset shape -> [depth, height, width] and ROI texture needs -> [hieght, width, depth]
-        const shape = this.dataset.metadata.shape; // i.e. [160, 640, 640]
-        this.shape = [...shape];
-        
-        let length;
-        if (this.shape.length === 2) {
-            length = this.shape[0] * this.shape[1]
-        }
-        else {
-            // [depth, height, width] --> [depth, width, height]
-            this.shape[0] = shape[1];
-            this.shape[1] = shape[2];
-            this.shape[2] = shape[0];
-            length = this.shape[0] * this.shape[1] * this.shape[2]; 
+    fetchROI = async () => {
+        const data = await APIDataService.getROIMaskSlice(this.dataset.file.id, '[:]');
+        let { mask, shape, dtype, packed_shape } = data;
+        let maskArray = unpackBitPackedBase64(mask, shape);
+
+        if (shape.length === 3) {
+            // [depth, height, width] --> [height, width, depth]
+            const newShape = [1, 2, 0]
+            const maskROI = swapArrayAxes(maskArray, shape, newShape);
+            maskArray = maskROI.array;
+            shape = maskROI.shape;
         }
 
-        // Initalize ROI layer        
-        this.roi = new Uint8Array(length);
+        this.roi = maskArray;
+        this.shape = shape;
+
+        // Now you can use the unpacked mask
+        console.log('Mask shape:', shape);
+        
+        // If you need it as a multidimensional array:
+        //const reshapedMask = reshape1DArray(unpackedMask, shape);
+        //console.log('Reshaped mask:', reshapedMask);
     }
 
     export = async () => {

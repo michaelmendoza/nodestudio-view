@@ -5,6 +5,7 @@ import AppState from './state/AppState';
 import Viewport from './components/Viewport/Viewport';
 import SideView from './components/SideView.jsx/SideView';
 import LoadingModal from './components/LoadingModal/LoadingModal';
+import ROIStatsWidget from './components/Widgets/ROIStatsWidget';
 
 const App = () => {
     return (
@@ -17,6 +18,8 @@ const App = () => {
 }
 
 const AppComponents = () => {
+    const { state } = AppState.useAppState();
+
     return (
         <div className='app-components'>
             <header className="header"> 
@@ -24,6 +27,7 @@ const AppComponents = () => {
             </header>
             <div className='main-components'>
                 <SideView></SideView>
+                <ROIStatsWidget stats={state.roiStats}></ROIStatsWidget>
                 <Viewport></Viewport>
             </div>
             <LoadingModal></LoadingModal>

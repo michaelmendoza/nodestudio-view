@@ -20,9 +20,13 @@ export const APIDataService = {
 
     // ************* ROI *************
 
+    getROIMaskSlice: (id, key) => fetchAPI(`${dataUrl}/roi/mask/slice?id=${id}&key=${key}`, FetchTypes.GET),
+
     updateROIMask: (id, indices, add = true) => fetchAPI(`${dataUrl}/roi/mask/update`, FetchTypes.POST, {id, indices, add}),
 
     exportSegmentedData: (id, filename) => fetchAPI(`${dataUrl}/roi/segment?id=${id}&filename=${filename}`, FetchTypes.GET),
+
+    getROIStats: (id) => fetchAPI(`${dataUrl}/roi/stats?id=${id}`, FetchTypes.GET),
 
     // ************* FileSystem Path *************
    
