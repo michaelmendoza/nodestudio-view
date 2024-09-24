@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import ChartControls from '../../components/Charts/ChartControls';
-import { setDepth } from '../../libraries/ROIRenderer';
+import { ROIMaskRenderer, setDepth } from '../../libraries/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
 import { GridHelper } from '../../libraries/MeshFactory';
 
@@ -24,6 +24,8 @@ class Viewer {
         this.roi_mesh_2D = null;
         this.roi_mesh_lightbox = {};
         this.grid_helper = null;
+
+        this.roiMaskRenderer = null;
 
         this.init();
 
@@ -53,6 +55,7 @@ class Viewer {
 
     init_dataset = (dataset) => {
         this.dataset = dataset;
+        this.roiMaskRenderer = new ROIMaskRenderer(this);
         this.controls.reset();
     }
 

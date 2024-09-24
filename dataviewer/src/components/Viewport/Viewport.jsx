@@ -84,7 +84,8 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
             view.init_dataset(state.activeDataset);
             view.reset_roi();
             render(view, state.activeDataset, state.viewMode);
-            renderROI(view, state.activeDataset, state.viewMode);
+            //renderROI(view, state.activeDataset, state.viewMode);
+            if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         }
 
         debounce(renderView, 100, `view-${id}-render`);
@@ -99,7 +100,8 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
 
     const handleIndexUpdate = async () => {
         updateRender(view, state.activeDataset, state.viewMode);
-        renderROI(view, state.activeDataset, state.viewMode);
+        //renderROI(view, state.activeDataset, state.viewMode);
+        if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         setUpdate(update+1);
     }
 

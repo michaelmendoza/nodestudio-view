@@ -92,7 +92,8 @@ class ChartControls {
         this.state = mousestate.left;
         if (this.state === STATE.ROI) {
             throttle(() => { 
-                const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
+                const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
+                //const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
                 updatePixelCache(pixels);
             }, 10, 'ROI-Viewer');
         }
@@ -124,7 +125,8 @@ class ChartControls {
             this.camera.updateProjectionMatrix();
         }
         if (this.state === STATE.ROI) {
-            const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
+            const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
+            //const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
             updatePixelCache(pixels);
         }
         if (this.state === STATE.ZOOM) {

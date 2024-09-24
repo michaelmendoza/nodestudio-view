@@ -4,7 +4,7 @@ import APIDataService from '../../services/APIDataService';
 class ROIViewer {
     constructor(dataset) {
         this.dataset = dataset;
-        this.roi = null;
+        this.mask = null;  // Uint8Array
         this.shape  = null; 
     }
 
@@ -22,8 +22,8 @@ class ROIViewer {
             shape = maskROI.shape;
         }
         */
-       
-        this.roi = maskArray;
+
+        this.mask = maskArray;
         this.shape = shape;
 
         // Now you can use the unpacked mask
@@ -35,7 +35,7 @@ class ROIViewer {
     }
 
     export = async () => {
-        const data = this.roi;
+        const data = this.mask;
         const shape = this.shape;
 
         const encoded = await pixelArrayToBase64(data);
