@@ -105,11 +105,11 @@ class Dataset:
         
         return {
             'size': roi_data.size,
-            'mean': float(np.mean(roi_data)),
-            'median': float(np.median(roi_data)),
-            'std_dev': float(np.std(roi_data)),
-            'min': float(np.min(roi_data)),
-            'max': float(np.max(roi_data)),
+            'mean': float(np.mean(roi_data)) if roi_data.size > 0 else 0,
+            'median': float(np.median(roi_data)) if roi_data.size > 0 else 0,
+            'std_dev': float(np.std(roi_data)) if roi_data.size > 0 else 0,
+            'min': float(np.min(roi_data)) if roi_data.size > 0 else 0,
+            'max': float(np.max(roi_data)) if roi_data.size > 0 else 0,
             'histogram': (np.histogram(roi_data, bins=bins)[0].tolist(), np.histogram(roi_data, bins=bins)[1].tolist())
         }
     
