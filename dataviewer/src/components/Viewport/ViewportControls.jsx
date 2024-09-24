@@ -23,7 +23,7 @@ const ViewportControls = ({ view, onUpdate, datasliceKey = 'z' }) => {
         viewIndices = [1, 2];
     }
     let keys = range(0, indices.length);
-    keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] &&  maxIndices[i] > 1);
+    keys = keys.filter((i) => i !== viewIndices[0] && i !== viewIndices[1] &&  maxIndices[i] > 0);
 
     const handleIndexUpdate = (index, value) => {
         console.log(index, value);

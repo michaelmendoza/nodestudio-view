@@ -13,6 +13,7 @@ class ROIViewer {
         let { mask, shape, dtype, packed_shape } = data;
         let maskArray = unpackBitPackedBase64(mask, shape);
 
+        /*
         if (shape.length === 3) {
             // [depth, height, width] --> [height, width, depth]
             const newShape = [1, 2, 0]
@@ -20,7 +21,8 @@ class ROIViewer {
             maskArray = maskROI.array;
             shape = maskROI.shape;
         }
-
+        */
+       
         this.roi = maskArray;
         this.shape = shape;
 

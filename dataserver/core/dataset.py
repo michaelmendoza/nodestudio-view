@@ -120,7 +120,7 @@ class Dataset:
         
         export_data = {
             'mask': self.roi.mask,
-            'indices': [i.tolist() for i in roi_indices],
+            'indices': np.array(roi_indices),
             'values': self.data[roi_indices],
             'statistics': roi_stats
         }
