@@ -12,7 +12,7 @@ export const APIDataService = {
 
     removeFile: (id) => fetchAPI(`${dataUrl}/files/remove?id=${id}`, FetchTypes.GET),
 
-    getFileData: (id, key, dims) => fetchAPI(`${dataUrl}/files/data?id=${id}&key=${key}&encode=${true}&dims=${dims}`, FetchTypes.GET),
+    getFileData: (id, key) => fetchAPI(`${dataUrl}/files/data?id=${id}&key=${key}&encode=${true}`, FetchTypes.GET),
 
     getFileMetadata: (id) => fetchAPI(`${dataUrl}/files/metadata?id=${id}`, FetchTypes.GET),
 

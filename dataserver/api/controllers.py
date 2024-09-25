@@ -24,12 +24,12 @@ def remove_file(id: str) -> str:
     """Remove a file from the dataset cache."""
     return io.remove_file(id)
 
-def get_data(fileid, key, encode = True, dims = ['Sli','Lin','Col']):
+def get_data(fileid, key, encode = True):
     """Retrieve data for a specific file and key."""
     dataset = DatasetCache.get(fileid)
     if not dataset:
         raise ValueError(f"Dataset with id {fileid} not found")
-    return dataset.get_data_subset(fileid, key, encode, dims)
+    return dataset.get_data_subset(fileid, key, encode)
 
 def get_metadata(fileid: str) -> Dict[str, Any]:
     """Retrieve metadata for a specific file."""

@@ -3,6 +3,7 @@ import ChartControls from '../../components/Charts/ChartControls';
 import { ROIMaskRenderer } from '../../libraries/Render/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
 import { GridHelper } from '../../libraries/MeshFactory';
+import { DatasetRenderer } from '../../libraries/DataRenderer';
 
 const raycaster = new THREE.Raycaster();
 
@@ -55,6 +56,7 @@ class Viewer {
 
     init_dataset = (dataset) => {
         this.dataset = dataset;
+        this.datasetRenderer = new DatasetRenderer(this);
         this.roiMaskRenderer = new ROIMaskRenderer(this);
         this.controls.reset();
     }
@@ -83,7 +85,7 @@ class Viewer {
     raycast = () => {
         if (!this.pointer) return;
         if (!this.dataset) return;
-        if (!this.dataset?.dataset?.shape) return
+        if (!this.dataset?.metadata?.shape) return;
         this.pointerPixel = new THREE.Vector2();
         
         raycaster.setFromCamera( this.pointer, this.camera );
@@ -113,7 +115,7 @@ class Viewer {
 
         // Get pixel value
         const { x, y } = this.pointerPixel;
-        const dataset = this.dataset.dataslices[this.datasliceKey];
+        const dataset = this.dataset.getDataSlice(this.datasliceKey);
         const data = dataset.unscaledData;
         const index = x + y * sizeX;
         const value = data[index];

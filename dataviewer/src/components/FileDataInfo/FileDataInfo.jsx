@@ -9,7 +9,6 @@ import APIDataService from '../../services/APIDataService';
 import Status from '../../state/models/Status';
 import { ViewDict } from '../../state/models/Viewer';
 import { updateUseBrush, updateBrushSize } from '../../state/models/ROI';
-import { render } from '../../libraries/DataRenderer';
 
 const FileDataInfo = () => {
     const { state } = useAppState();
@@ -26,21 +25,22 @@ const ContrastOptions = () => {
     const { state } = useAppState();
 
     const updateRender = async () => {
-        await state.activeDataset.fetchDataset();
+        //await state.activeDataset.fetchDataset();
         for (let key in ViewDict){
             const view = ViewDict[key];
-            await render(view, state.activeDataset, state.viewMode);
+            if (view.datasetRenderer) view.datasetRenderer.render();
+            //await render(view, state.activeDataset, state.viewMode);
         } 
     }
 
     const updateContrastLevel = async (value) => {
         state.activeDataset.contrast.level = value;
-        updateRender();   
+        //updateRender();   
     }
 
     const updateContrastWindow = async (value) => {
         state.activeDataset.contrast.window = value;
-        updateRender();  
+        //updateRender();  
     }
 
     return (<div className='viewer-options'>
@@ -59,12 +59,13 @@ const ViewerOptions = () => {
         if(!state.activeDataset) return;
 
         state.activeDataset.setViewMode(viewMode);
-        await state.activeDataset.fetchDataset();
+        //await state.activeDataset.fetchDataset();
         for (let key in ViewDict){
             const view = ViewDict[key];
   
             view.init_dataset(state.activeDataset);
-            render(view, state.activeDataset, viewMode);
+            //render(view, state.activeDataset, viewMode);
+            if (view.datasetRenderer) view.datasetRenderer.render();
             if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         } 
     }
@@ -73,7 +74,7 @@ const ViewerOptions = () => {
         dispatch({ type:ActionTypes.SET_VIEW_MODE, payload: mode });
 
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: true, message: 'Loading data ...' }) });
-        await updateRender(mode);
+        //await updateRender(mode);
         dispatch({ type: ActionTypes.SET_LOADING_STATUS, payload: new Status({ show: false}) });
     }
 

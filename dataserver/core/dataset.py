@@ -66,12 +66,11 @@ class Dataset:
         indices = [math.floor(s / 2) for s in shape ]
         return encode_preview(self.data, indices, size)
 
-    def get_data_subset(self, fileid: str, key: str, encode: bool = True, dims: List[str] = ['Sli','Lin','Col']) -> Dict[str, Any]:
+    def get_data_subset(self, fileid: str, key: str, encode: bool = True) -> Dict[str, Any]:
         """Retrieve data for a specific file and key."""
         
         # Reshape data if dims requires
         dataset_dims = self.metadata['dims']
-        dims = eval(dims)
 
         # Slice data and reorganize array to encoding
         data = self.data

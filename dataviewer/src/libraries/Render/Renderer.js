@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Chart2D_FragmentShader, Chart2D_VertexShader, Debug_FragmentShader, ROI_FragmentShader_DataTexture } from "./ChartShaders";
+import { Chart2D_VertexShader, Chart2D_FragmentShader_DataTexture, Debug_FragmentShader, ROI_FragmentShader_DataTexture } from "./ChartShaders";
 
 /** DEBUG Flag for ROI Texture */
 const DEBUG_ROI_TEXTURE = false;
@@ -48,7 +48,7 @@ export const createDataTextureMesh = (data, height, width, meshtype, scene) => {
         fragmentShader = ROI_FragmentShader_DataTexture;
         if (DEBUG_ROI_TEXTURE) fragmentShader = Debug_FragmentShader;
     }
-    else fragmentShader = Chart2D_FragmentShader;
+    else fragmentShader = Chart2D_FragmentShader_DataTexture;
 
     const material = new THREE.ShaderMaterial({
         uniforms: {

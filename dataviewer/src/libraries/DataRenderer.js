@@ -1,28 +1,59 @@
-import * as THREE from 'three';
-import { Chart2D_FragmentShader, Chart2D_VertexShader } from "./Render/ChartShaders";
-import { throttle2 } from "./Utils";
 import { createDataTextureMesh, getSliceDimensions } from './Render/Renderer';
+import { generateKeyFromIndices } from './ArrayIndexer';
 
 export class DatasetRenderer {
     constructor(viewport) {
         this.viewport = viewport;
         this.dataset = viewport.dataset;
-        [this.depth, this.height, this.width] = getSliceDimensions(this.roi.shape, this.viewport.datasliceKey);
-        this.texture = createDataTextureMesh(this.roi.mask, this.height, this.width, 'dataslice', this.viewport.scene);
+        this.init();
     }
 
-    render() {
-        const { indices, shape } = this.dataset;
+    init() {
+        [this.depth, this.height, this.width] = getSliceDimensions(this.dataset.metadata.shape, this.viewport.datasliceKey);
+        const blankdata = new Uint8Array(this.height * this.width).fill(0);
+        this.texture = createDataTextureMesh(blankdata, this.height, this.width, 'dataslice', this.viewport.scene);
+    }
+
+    async render () {
         const { datasliceKey } = this.viewport;
-        const is2D = shape.length === 2;
-
-        const sliceIndex = is2D ? 0 : indices[['z', 'y', 'x'].indexOf(datasliceKey)];
-        const sliceData = this.getSliceData(sliceIndex, datasliceKey);
-
+        const sliceData = await this.getSliceData(datasliceKey);
         this.updateTexture(sliceData);
     }
 
+    getViewIndices(shape, datasliceKey) {
+        let viewIndices;
+        if (shape.length === 2) {
+            viewIndices = [0, 1];
+        }
+        else {
+            const viewOptions = {
+                'z': [1,2],
+                'y': [0,2],
+                'x': [1,0]
+            }
+            viewIndices = viewOptions[datasliceKey];
+        }
+        return viewIndices;
+    }
+
+    async getSliceData(datasliceKey) {
+        const { indices, shape } = this.dataset;
+        const viewIndices = this.getViewIndices(shape, datasliceKey);
+        const key = generateKeyFromIndices(shape, indices, viewIndices);
+        const sliceData = await this.dataset.fetchDataset(key);
+        return sliceData.data;
+    }
+
+    updateTexture(sliceData) {
+        this.texture.image.data = sliceData;
+        this.texture.image.width = this.width;
+        this.texture.image.height = this.height;
+        this.texture.needsUpdate = true;
+    }
+
 }
+
+/*
 export const render = (viewport, dataset, viewMode) => {
     if(viewMode === '2D View') render2D(viewport, dataset);
     if(viewMode === '3D View') render2D(viewport, dataset);
@@ -170,3 +201,4 @@ const renderSlice = async (texture, viewport, width, height, offset, meshIndex) 
         viewport.mesh_lightbox[meshIndex] = mesh;
     }
 }
+    */

@@ -14,7 +14,7 @@ void main() {
 
 }`;
 
-export const Chart2D_FragmentShader = `
+export const Chart2D_FragmentShader_DataArrayTexture = `
 precision highp float;
 precision highp int;
 precision highp sampler2DArray;
@@ -32,6 +32,22 @@ void main() {
     // lighten a bit
     outColor = vec4( color.rrr * 1.5, 1.0 );
 
+}
+`;
+
+export const Chart2D_FragmentShader_DataTexture = `
+precision highp float;
+precision highp int;
+uniform sampler2D diffuse;
+in vec2 vUv;
+out vec4 outColor;
+
+void main() {
+
+    vec4 color = texture(diffuse, vUv);
+
+    // lighten a bit - using gamma correction
+    outColor = vec4( color.rrr * 1.5, 1.0 );
 }
 `;
 
@@ -61,10 +77,8 @@ void main() {
 export const ROI_FragmentShader_DataTexture = `
 precision highp float;
 precision highp int;
-
 uniform sampler2D diffuse;
 in vec2 vUv;
-
 out vec4 outColor;
 
 void main() {

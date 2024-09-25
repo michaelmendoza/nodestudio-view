@@ -6,18 +6,36 @@ import ROIViewer from "./ROIViewer";
 
 export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 
-class Dataset {
+/** Get viewIndices for a given shape anddatasliceKey */
+export const getViewIndices = (shape, datasliceKey) => {
+    let viewIndices;
+    if (shape.length === 2) {
+        viewIndices = [0, 1];
+    }
+    else {
+        const viewOptions = {
+            'z': [1,2],
+            'y': [0,2],
+            'x': [1,0]
+        }
+        viewIndices = viewOptions[datasliceKey];
+    }
+    return viewIndices;
+}
+
+export class Dataset {
 
     constructor(file) {
         this.file = file; // TODO: Refactor and combine file and metadata into one object
         this.metadata = null;
-        this.dataset = null; // TODO: Refactor to dataslice 
-        this.dataslices = {
-            x: null,
-            y: null,
-            z: null,
-            lightbox: null
-        }
+        //this.dataset = null; // TODO: Refactor to dataslice 
+        this.datacache = {} // Cache holds data slices by key i.e. '[:,40,:]'
+        //this.dataslices = {
+        //    x: null,
+        //    y: null,
+        //    z: null,
+        //    lightbox: null
+        //}
         this.viewMode = '2D View';
 
         this.ndim = 0;
@@ -39,17 +57,24 @@ class Dataset {
     init = async (viewMode) => {
         this.setViewMode(viewMode);
         await this.fetchMetadata();
-        await this.fetchDataset();
         this.roi = new ROIViewer(this);
         await this.roi.fetchROI();
     }
 
+    getDataSlice = (datasliceKey) => {
+        const viewIndices = getViewIndices(this.metadata.shape, datasliceKey);
+        const sliceKey = generateKeyFromIndices(this.metadata.shape, this.indices, viewIndices);
+        const dataSlice = this.datacache[sliceKey];
+        return dataSlice
+    }
+
+    /*
     getData = (viewKey = 'z') => {
         if (this.viewMode === '2D View') return this.dataset;
         if (this.viewMode === '3D View') return this.dataslices[viewKey]
         if (this.viewMode === 'Lightbox') return this.dataslices.lightbox;
     }
-
+    */
     getSliceShape = (datasliceKey) => {
         const sliceShape = ({
             z: [this.metadata.shape[1], this.metadata.shape[2]],
@@ -95,9 +120,10 @@ class Dataset {
     }
 
     /** Fetches Dataset from API */
-    fetchDataset = async () => {
+    fetchDataset = async (sliceKey) => {
         const fetch = async (sliceKey) => {
-            let data = await APIDataService.getFileData(this.file.id, sliceKey, this.dims);
+            // Fetch data from API
+            let data = await APIDataService.getFileData(this.file.id, sliceKey);
             if (data.isEncoded) {
                 data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
             } 
@@ -105,6 +131,22 @@ class Dataset {
             return scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype, useContrast:true, contrast: this.contrast })
         }
 
+        let dataset;
+        // Check cache for sliceKey
+        if (this.datacache[sliceKey]) {
+            dataset = this.datacache[sliceKey];
+        }
+        else {
+            // If not in cache, fetch and cache
+            dataset = await fetch(sliceKey);
+            this.datacache[sliceKey] = dataset;
+        }
+
+        this.update++;
+        return dataset;
+
+        /*
+        let dataset;
         if (this.viewMode === 'Lightbox') {
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices, [0,1,2]);      
             this.dims = "['Lin','Col','Sli']"; 
@@ -123,12 +165,17 @@ class Dataset {
         }
         else { // 2D View
             this.key = generateKeyFromIndices(this.metadata.shape, this.indices, this.viewIndices);
-            this.dims = "['Sli','Lin','Col']";
-            this.dataset = await fetch(this.key);
-            this.dataslices.z = this.dataset;
+            //this.dims = "['Sli','Lin','Col']";
+            if (this.datacache[this.key]) {
+                dataset = this.datacache[this.key];
+            }
+            else {
+                dataset = await fetch(this.key);
+                this.dataslices.z = dataset;
+                this.datacache[this.key] = dataset;
+            }
         }
-
-        this.update++;
+        */
     }
 }
 
