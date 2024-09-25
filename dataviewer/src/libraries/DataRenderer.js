@@ -79,6 +79,7 @@ const render2D = (viewport, dataset) => {
         const material = create2DMaterial(texture, planeWidth, planeHeight);
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
         const mesh = new THREE.Mesh( geometry, material );
+        mesh.name = 'dataslice';
 
         viewport.scene.add( mesh );    
         viewport.mesh_2D = mesh;      

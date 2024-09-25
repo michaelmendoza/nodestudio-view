@@ -1,10 +1,12 @@
 import * as THREE from 'three';
-import { Chart2D_VertexShader, ROI_FragmentShader } from "./ChartShaders";
+import { Chart2D_VertexShader, ROI_FragmentShader_DataTexture } from "./ChartShaders";
 import { ROIOptions } from '../state/models/ROI';
 import { ViewDict } from '../state/models/Viewer';
 
 export class ROIMaskRenderer {
     constructor(viewport) {
+        this.viewport = viewport;
+        this.dataset = viewport.dataset;
         this.roi = viewport.dataset.roi;
 
         if (this.roi.shape.length === 2) { 
@@ -28,45 +30,56 @@ export class ROIMaskRenderer {
             this.width = this.roi.shape[1];
         }
 
-        this.texture = new THREE.DataTexture(this.roi.mask, this.width, this.height, THREE.LuminanceFormat);
-        this.texture.needsUpdate = true;
-
-        this.material = new THREE.MeshBasicMaterial({
-            map: this.texture,
-            transparent: true,
-        });
-
         const factor = this.height / this.width;
         const planeWidth = 100
         const planeHeight = planeWidth * factor;
+
+        this.texture = new THREE.DataTexture(
+            this.roi.mask, 
+            this.width, 
+            this.height, 
+            THREE.RedFormat,
+            THREE.UnsignedByteType);
+        this.texture.needsUpdate = true;
+
+        this.material = new THREE.ShaderMaterial( {
+            uniforms: {
+                diffuse: { value: this.texture },
+                size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+            },
+            vertexShader: Chart2D_VertexShader,
+            fragmentShader: ROI_FragmentShader_DataTexture,
+            glslVersion: THREE.GLSL3,
+            transparent: true,
+        } );
+        this.material.transparent = true;
+
         const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
         const mesh = new THREE.Mesh(geometry, this.material);
         mesh.name = 'roi';
 
+        // Search viewport.scene.children for mesh with name 'roi' and remove
+        viewport.scene.children.forEach((child) => {
+            if (child.name === 'roi') viewport.scene.remove(child);
+        });
+
+        // Add mesh to viewport.scene
         viewport.scene.add( mesh );
         viewport.roi_mesh_2D = mesh;  
     }
 
-    /** Parse slicekey into z, y, x indices */
-    parseSliceKey(sliceKey) {
-        const parts = sliceKey.split(',').map(part => part.trim());
-        const [z, y, x] = parts.map(part => part === ':' ? null : parseInt(part));
-        return [z, y, x];
-    }
-
-    /** Render based on slicekey. [z,:,:] -> xy plane, [:,y,:] -> xz plane, [:,:,x] -> yz plane */
+    /** Render based on viewport.datasliceKey */
     render() {
         const indices = this.viewport.dataset.indices;
         const sliceKeys = {
-            '2d': [indices[0], null, null],
             'z': [indices[0], null, null],
             'y': [null, indices[1], null],
             'x': [null, null, indices[2]]
         }
-        const sliceKey = sliceKeys[this.viewport.datasliceKey];
-        const [z, y, x] = this.parseSliceKey(sliceKey);
-        let sliceData;
+        const is2D = this.roi.shape.length === 2;
+        const [z, y, x] = is2D? [0, null, null] : sliceKeys[this.viewport.datasliceKey];
 
+        let sliceData;
         if (z !== null) {
             sliceData = new Uint8Array(this.width * this.height);
             for (let i = 0; i < this.width * this.height; i++) {
@@ -104,6 +117,7 @@ export class ROIMaskRenderer {
         const dataset = viewport.dataset;
         const roi = dataset.roi;
         const indices = dataset.indices;
+        const datasliceKey = viewport.datasliceKey;
         console.log('update', pixel)
     
         const depthOptions = {
@@ -112,7 +126,7 @@ export class ROIMaskRenderer {
             'x': indices[2]
         }
         const is2D = this.roi.shape.length === 2;
-        const depth = is2D ? 0 : depthOptions[viewport.datasliceKey];
+        const depth = is2D ? 0 : depthOptions[datasliceKey];
             
         const value = 255;
         const brush = ROIOptions.brush;
@@ -167,6 +181,7 @@ export class ROIMaskRenderer {
             roi.mask[index] = ROIOptions.useBrush ? value : 0;
         })
 
+        this.render()
         return points;
     }
 }
@@ -350,5 +365,5 @@ const createMaterial = (texture, depth, planeWidth = 100, planeHeight = 100) => 
 }
 
 export const setDepth = (viewport, depth) => {
-    viewport.roi_mesh_2D.material.uniforms[ "depth" ].value = depth;
+    //viewport.roi_mesh_2D.material.uniforms[ "depth" ].value = depth;
 }

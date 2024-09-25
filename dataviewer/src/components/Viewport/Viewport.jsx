@@ -82,7 +82,7 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
             if(!view) return;
             if(!state.activeDataset) return;
             view.init_dataset(state.activeDataset);
-            view.reset_roi();
+            //view.reset_roi();
             render(view, state.activeDataset, state.viewMode);
             //renderROI(view, state.activeDataset, state.viewMode);
             if (view.roiMaskRenderer) view.roiMaskRenderer.render();

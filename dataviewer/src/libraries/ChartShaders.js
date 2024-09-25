@@ -35,7 +35,7 @@ void main() {
 }
 `;
 
-export const ROI_FragmentShader = `
+export const ROI_FragmentShader_DataArrayTexture = `
 precision highp float;
 precision highp int;
 precision highp sampler2DArray;
@@ -57,3 +57,23 @@ void main() {
     }
 }
 `;
+
+export const ROI_FragmentShader_DataTexture = `
+precision highp float;
+precision highp int;
+
+uniform sampler2D diffuse;
+in vec2 vUv;
+
+out vec4 outColor;
+
+void main() {
+    vec4 color = texture(diffuse, vUv);
+
+    if (color.r > 0.0) {
+        outColor = vec4(1.0, 0.0, 0.0, 0.4);  // Red with 40% opacity
+    } else {
+        outColor = vec4(0.0, 0.0, 0.0, 0.0);  // Transparent
+    }
+}
+`
