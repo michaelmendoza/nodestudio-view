@@ -1,7 +1,28 @@
 import * as THREE from 'three';
-import { Chart2D_FragmentShader, Chart2D_VertexShader } from "./ChartShaders";
+import { Chart2D_FragmentShader, Chart2D_VertexShader } from "./Render/ChartShaders";
 import { throttle2 } from "./Utils";
+import { createDataTextureMesh, getSliceDimensions } from './Render/Renderer';
 
+export class DatasetRenderer {
+    constructor(viewport) {
+        this.viewport = viewport;
+        this.dataset = viewport.dataset;
+        [this.depth, this.height, this.width] = getSliceDimensions(this.roi.shape, this.viewport.datasliceKey);
+        this.texture = createDataTextureMesh(this.roi.mask, this.height, this.width, 'dataslice', this.viewport.scene);
+    }
+
+    render() {
+        const { indices, shape } = this.dataset;
+        const { datasliceKey } = this.viewport;
+        const is2D = shape.length === 2;
+
+        const sliceIndex = is2D ? 0 : indices[['z', 'y', 'x'].indexOf(datasliceKey)];
+        const sliceData = this.getSliceData(sliceIndex, datasliceKey);
+
+        this.updateTexture(sliceData);
+    }
+
+}
 export const render = (viewport, dataset, viewMode) => {
     if(viewMode === '2D View') render2D(viewport, dataset);
     if(viewMode === '3D View') render2D(viewport, dataset);
@@ -62,8 +83,8 @@ const render2D = (viewport, dataset) => {
 
     const factor = _dataset.shape[0] / _dataset.shape[1];
     const planeWidth = 100
-
     const planeHeight = planeWidth * factor;
+    console.log(`render2d: slice:${viewport.datasliceKey}, factor: ${factor}, planeWidth: ${planeWidth}, planeHeight: ${planeHeight}`);
 
     if (viewport.mesh_2D) {
         // Update mesh texture 

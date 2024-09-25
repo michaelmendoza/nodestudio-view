@@ -1,5 +1,4 @@
 import { throttle } from '../../libraries/Utils';
-import { updatePixel } from '../../libraries/ROIRenderer';
 import APIDataService from '../../services/APIDataService';
 import { ROIOptions, ROIStats } from '../../state/models/ROI';
 import { ActionTypes, Dispatch } from '../../state';
@@ -93,7 +92,6 @@ class ChartControls {
         if (this.state === STATE.ROI) {
             throttle(() => { 
                 const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
-                //const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
                 updatePixelCache(pixels);
             }, 10, 'ROI-Viewer');
         }
@@ -126,7 +124,6 @@ class ChartControls {
         }
         if (this.state === STATE.ROI) {
             const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
-            //const pixels = updatePixel(this.viewer, this.viewer.dataset, this.viewer.dataset.viewMode, this.viewer.pointerPixel);
             updatePixelCache(pixels);
         }
         if (this.state === STATE.ZOOM) {

@@ -10,7 +10,6 @@ import Status from '../../state/models/Status';
 import { ViewDict } from '../../state/models/Viewer';
 import { updateUseBrush, updateBrushSize } from '../../state/models/ROI';
 import { render } from '../../libraries/DataRenderer';
-import { renderROI } from '../../libraries/ROIRenderer';
 
 const FileDataInfo = () => {
     const { state } = useAppState();
@@ -65,9 +64,8 @@ const ViewerOptions = () => {
             const view = ViewDict[key];
   
             view.init_dataset(state.activeDataset);
-            view.reset_roi();
-            await render(view, state.activeDataset, viewMode);
-            await renderROI(view, state.activeDataset, viewMode);
+            render(view, state.activeDataset, viewMode);
+            if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         } 
     }
 

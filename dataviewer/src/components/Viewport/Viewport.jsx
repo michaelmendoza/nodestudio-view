@@ -8,7 +8,6 @@ import Status from '../../state/models/Status';
 import Viewer from '../../state/models/Viewer';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import { render, updateRender } from '../../libraries/DataRenderer';
-import { renderROI } from '../../libraries/ROIRenderer';
 import APIDataService from '../../services/APIDataService';
 import { ROIStats } from '../../state/models/ROI';
 
@@ -82,9 +81,7 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
             if(!view) return;
             if(!state.activeDataset) return;
             view.init_dataset(state.activeDataset);
-            //view.reset_roi();
             render(view, state.activeDataset, state.viewMode);
-            //renderROI(view, state.activeDataset, state.viewMode);
             if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         }
 
@@ -100,7 +97,6 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
 
     const handleIndexUpdate = async () => {
         updateRender(view, state.activeDataset, state.viewMode);
-        //renderROI(view, state.activeDataset, state.viewMode);
         if (view.roiMaskRenderer) view.roiMaskRenderer.render();
         setUpdate(update+1);
     }

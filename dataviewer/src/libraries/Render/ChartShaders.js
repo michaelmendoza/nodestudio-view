@@ -77,3 +77,16 @@ void main() {
     }
 }
 `
+
+export const Debug_FragmentShader = `
+precision highp float;
+precision highp int;
+
+uniform sampler2D diffuse;
+in vec2 vUv;
+
+out vec4 outColor;
+void main() {
+    outColor = vec4(vUv.x, vUv.y, 0.0, 0.5);
+}
+`;

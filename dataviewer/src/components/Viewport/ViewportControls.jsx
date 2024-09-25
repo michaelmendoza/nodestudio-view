@@ -2,7 +2,6 @@ import './ViewportControls.scss';
 import { range } from '../../libraries/Utils';
 import Slider from '../Slider/Slider';
 import { useAppState } from '../../state';
-import { setDepth } from '../../libraries/ROIRenderer';
 
 const ViewportControls = ({ view, onUpdate, datasliceKey = 'z' }) => {
     const { state } = useAppState();
@@ -28,7 +27,6 @@ const ViewportControls = ({ view, onUpdate, datasliceKey = 'z' }) => {
     const handleIndexUpdate = (index, value) => {
         console.log(index, value);
         state.activeDataset.updateIndex(index, value);
-        setDepth(view, value);
         onUpdate();
     }
 
