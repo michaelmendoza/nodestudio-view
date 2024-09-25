@@ -125,16 +125,22 @@ export class Dataset {
             // Fetch data from API
             let data = await APIDataService.getFileData(this.file.id, sliceKey);
             if (data.isEncoded) {
-                data = decodeDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype })
+                data = decodeDataset({ ...data })
             } 
     
-            return scaleDataset({ data: data.data, shape: data.shape, min: data.min, max: data.max, dtype: data.dtype, useContrast:true, contrast: this.contrast })
+            return scaleDataset({ ...data, contrast: this.contrast })
         }
 
         let dataset;
         // Check cache for sliceKey
         if (this.datacache[sliceKey]) {
             dataset = this.datacache[sliceKey];
+
+            // If contrast has changed, re-scale dataset 
+            if (dataset.contrast.level !== this.contrast.level || dataset.contrast.window !== this.contrast.window) {
+                dataset = scaleDataset({ ...dataset, data: dataset.unscaledData, contrast: this.contrast })
+                this.datacache[sliceKey] = dataset;
+            }
         }
         else {
             // If not in cache, fetch and cache

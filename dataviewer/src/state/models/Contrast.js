@@ -1,10 +1,14 @@
 
 class Contrast {
 
-	constructor() {
-		this.level = 2048.0;
-		this.window = 4096.0;
-		this.resolution = 4096;
+	constructor(level = 2048.0, window = 4096.0, resolution = 4096) {
+		this.level = level;
+		this.window = window;
+		this.resolution = resolution;
+	}
+
+	copy() {
+		return new Contrast(this.level, this.window, this.resolution);
 	}
 
 	getMin() {

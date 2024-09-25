@@ -3,7 +3,7 @@
  * Scales data to range of 0 - 255 values. Has the option of using contrast calculations or 
  * just doing a simple scaling between min/max values
  */
-export const scaleDataset = ({ data, shape, min, max, useContrast = false, contrast }) => {
+export const scaleDataset = ({ data, shape, min, max, contrast, useContrast = true }) => {
     const resolution = 255;
     const length = shape.reduce((a,b) => a * b); //shape[0] * shape[1];
     const uint8Array = new Uint8Array(length);
@@ -19,6 +19,7 @@ export const scaleDataset = ({ data, shape, min, max, useContrast = false, contr
     dataset.isScaled = true;
     dataset.scalingResolution = 255;
     dataset.unscaledData = data;
+    dataset.contrast = contrast.copy();
     return dataset;
 }
 

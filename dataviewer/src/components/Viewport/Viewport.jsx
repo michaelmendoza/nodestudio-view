@@ -87,7 +87,7 @@ const View = ({ id, style = {}, dataslicekey = 'z' }) => {
 
         debounce(renderView, 100, `view-${id}-render`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.activeDataset])
+    }, [state.activeDataset, view])
 
     const init = () => {
         const viewer = new Viewer(id, ref, dispatch, dataslicekey);
