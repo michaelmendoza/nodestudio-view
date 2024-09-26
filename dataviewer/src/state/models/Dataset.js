@@ -42,7 +42,6 @@ export class Dataset {
 
         this.contrast = new Contrast();
         this.roi = null;
-        this.views = [] // Viewport viewers reference to this dataset
     }
 
     /** Initalize dataset with metadata */

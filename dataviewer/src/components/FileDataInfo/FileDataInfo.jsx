@@ -60,10 +60,8 @@ const ViewerOptions = () => {
         
         for (let key in ViewDict){
             const view = ViewDict[key];
-  
             view.init_dataset(state.activeDataset);
-            if (view.datasetRenderer) view.datasetRenderer.render();
-            if (view.roiMaskRenderer) view.roiMaskRenderer.render();
+            view.render();
         } 
     }
 

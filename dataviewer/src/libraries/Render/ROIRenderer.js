@@ -51,6 +51,7 @@ export class ROIMaskRenderer {
         this.texture.needsUpdate = true;
     }
 
+    /** Updates a roi.mask for the given pixel/brush and returns the added points. */
     drawMask(viewport, pixel) {
         const { indices } = this.dataset;
         const { datasliceKey } = viewport;
@@ -60,7 +61,7 @@ export class ROIMaskRenderer {
         const points = this.getPointsToDraw(pixel, depth);
         this.updateROIMask(points);
 
-        this.render();
+        //this.render();
         return points;
     }
 

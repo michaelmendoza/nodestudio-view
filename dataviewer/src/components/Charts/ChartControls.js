@@ -2,6 +2,7 @@ import { throttle } from '../../libraries/Utils';
 import APIDataService from '../../services/APIDataService';
 import { ROIOptions, ROIStats } from '../../state/models/ROI';
 import { ActionTypes, Dispatch } from '../../state';
+import Viewer from '../../state/models/Viewer';
 
 export const STATE = {
     NONE: 0,
@@ -91,7 +92,8 @@ class ChartControls {
         this.state = mousestate.left;
         if (this.state === STATE.ROI) {
             throttle(() => { 
-                const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
+                const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);            
+                Viewer.renderROI();
                 updatePixelCache(pixels);
             }, 10, 'ROI-Viewer');
         }
@@ -124,6 +126,7 @@ class ChartControls {
         }
         if (this.state === STATE.ROI) {
             const pixels = this.viewer.roiMaskRenderer.drawMask(this.viewer, this.viewer.pointerPixel);
+            Viewer.renderROI();
             updatePixelCache(pixels);
         }
         if (this.state === STATE.ZOOM) {

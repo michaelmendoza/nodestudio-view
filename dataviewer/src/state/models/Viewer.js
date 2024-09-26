@@ -3,7 +3,7 @@ import ChartControls from '../../components/Charts/ChartControls';
 import { ROIMaskRenderer } from '../../libraries/Render/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
 import { GridHelper } from '../../libraries/MeshFactory';
-import { DatasetRenderer } from '../../libraries/DataRenderer';
+import { DatasetRenderer } from '../../libraries/Render/DataRenderer';
 
 const raycaster = new THREE.Raycaster();
 
@@ -35,6 +35,14 @@ class Viewer {
         window.addEventListener('resize', () => debounce(this.handleResize.bind(this), 100, 'viewport-resize-'+this.id));
     }
     
+    /** Render ROI masks for all views */
+    static renderROI = () => {
+        for (let key in ViewDict){
+            const view = ViewDict[key];
+            if (view.roiMaskRenderer) view.roiMaskRenderer.render();
+        }
+    }
+
     init = () => {
         this.frustumSize = 100;
         const width = this.ref.current.offsetWidth;
@@ -59,6 +67,12 @@ class Viewer {
         this.datasetRenderer = new DatasetRenderer(this);
         this.roiMaskRenderer = new ROIMaskRenderer(this);
         this.controls.reset();
+    }
+
+    /** Renders dataset and ROI mask */
+    render = () => {
+        if (this.datasetRenderer) this.datasetRenderer.render();
+        if (this.roiMaskRenderer) this.roiMaskRenderer.render();
     }
 
     animate = () => {

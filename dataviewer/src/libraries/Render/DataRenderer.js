@@ -1,6 +1,6 @@
-import { createDataTextureMesh, getSliceDimensions } from './Render/Renderer';
-import { generateKeyFromIndices } from './ArrayIndexer';
-import { getViewIndices } from '../state/models/Dataset';
+import { createDataTextureMesh, getSliceDimensions } from './Renderer';
+import { generateKeyFromIndices } from '../ArrayIndexer';
+import { getViewIndices } from '../../state/models/Dataset';
 
 export class DatasetRenderer {
     constructor(viewport) {
