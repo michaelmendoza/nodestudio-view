@@ -51,7 +51,7 @@ const ContrastOptions = () => {
 
 const ViewerOptions = () => {
     const { state, dispatch } = useAppState();
-    const viewOptions = ['2D View', '3D View', 'Lightbox']
+    const viewOptions = ['2D View', '3D View'] //;, 'Lightbox']
 
     const updateRender = async (viewMode) => {
         if(!state.activeDataset) return;

@@ -12,7 +12,8 @@ export class ROIMaskRenderer {
     }
 
     render() {
-        const { indices, shape } = this.dataset;
+        const { indices } = this.dataset;
+        const { shape } = this.dataset.metadata;
         const { datasliceKey } = this.viewport;
         const is2D = shape.length === 2;
 

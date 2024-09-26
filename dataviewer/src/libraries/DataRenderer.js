@@ -1,5 +1,6 @@
 import { createDataTextureMesh, getSliceDimensions } from './Render/Renderer';
 import { generateKeyFromIndices } from './ArrayIndexer';
+import { getViewIndices } from '../state/models/Dataset';
 
 export class DatasetRenderer {
     constructor(viewport) {
@@ -20,25 +21,10 @@ export class DatasetRenderer {
         this.updateTexture(sliceData);
     }
 
-    getViewIndices(shape, datasliceKey) {
-        let viewIndices;
-        if (shape.length === 2) {
-            viewIndices = [0, 1];
-        }
-        else {
-            const viewOptions = {
-                'z': [1,2],
-                'y': [0,2],
-                'x': [1,0]
-            }
-            viewIndices = viewOptions[datasliceKey];
-        }
-        return viewIndices;
-    }
-
     async getSliceData(datasliceKey) {
-        const { indices, shape } = this.dataset;
-        const viewIndices = this.getViewIndices(shape, datasliceKey);
+        const { indices } = this.dataset;
+        const { shape } = this.dataset.metadata;
+        const viewIndices = getViewIndices(shape, datasliceKey);
         const key = generateKeyFromIndices(shape, indices, viewIndices);
         const sliceData = await this.dataset.fetchDataset(key);
         return sliceData.data;
