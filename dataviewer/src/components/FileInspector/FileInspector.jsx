@@ -2,11 +2,17 @@ import './FileInspector.scss';
 import { useAppState } from '../../state/AppState';
 import Divider from '../Divider/Divider';
 import { formatNumber } from '../../libraries/Format';
+import ROIStatsWidget from '../Widgets/ROIStatsWidget';
 
 const FileInspector = () => {
+    const { state } = useAppState();
+
     return (<div className='file-inspector'>
         <FileDataInspector></FileDataInspector>
         <FileMetadataInspector></FileMetadataInspector>
+        <div>
+            <ROIStatsWidget stats={state.roiStats}></ROIStatsWidget>
+        </div>
     </div>)
 }
 
@@ -20,7 +26,6 @@ const FileDataInspector = () => {
             file ? <div className='file-data-inspector'>
                 <label>File</label>
                 <FileDataInfoItem label={'Name'} info={file.name}></FileDataInfoItem>
-                <FileDataInfoItemSmallText label={'ID'} info={file.id}></FileDataInfoItemSmallText>
                 <FileDataInfoItem label={'Type'} info={file.type}></FileDataInfoItem>
             </div> : null
         }
