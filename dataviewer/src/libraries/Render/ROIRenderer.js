@@ -29,13 +29,14 @@ export class ROIMaskRenderer {
 
         if (datasliceKey === 'z' || this.roi.shape.length === 2) {
             sliceData.set(this.roi.mask.subarray(sliceIndex * sliceSize, (sliceIndex + 1) * sliceSize));
-        } else {
-            for (let i = 0; i < this.width; i++) {
-                for (let j = 0; j < this.depth; j++) {
-                    const srcIndex = datasliceKey === 'y'
-                        ? j * this.width * this.height + sliceIndex * this.width + i
-                        : j * this.width * this.height + i * this.width + sliceIndex;
-                    sliceData[j * this.width + i] = this.roi.mask[srcIndex];
+        } 
+        else {
+            for (let j = 0; j < this.height; j++) {
+                for (let i = 0; i < this.width; i++) {
+                    let index;
+                    if (datasliceKey === 'y') index = i + sliceIndex * this.width + j * this.width * this.depth;
+                    if (datasliceKey === 'x') index = sliceIndex + i * this.depth + j * this.width * this.depth;
+                    sliceData[i + j * this.width] = this.roi.mask[index];
                 }
             }
         }
@@ -64,40 +65,28 @@ export class ROIMaskRenderer {
     }
 
     getPointsToDraw(pixel, depth) {
-        const { brush, useBrush } = ROIOptions;
+        const { brush } = ROIOptions;
         const points = [];
         const { datasliceKey } = this.viewport;
         const is2D = this.roi.shape.length === 2;
 
-        const addPoint = (x, y) => {1   
-            if (x < 0 && y < 0) { 
+        const addPoint = (x, y) => {
+            // Check if point is outside of bounds
+            if (x < 0 && y < 0 && x >= this.width && y >= this.height) { 
                 return;
             }
             
-            if (is2D && x < this.width && y < this.height) {
-                points.push({ x, y });
-                return;
-            }
-
+            // Get point 
             let point;
-            switch (datasliceKey) {
-                case 'z':
-                    if (x < this.width && y < this.height) {
-                        point = { x, y, z: depth };
-                    }
-                    break;
-                case 'y':
-                    if (x < this.width && y < this.depth) {
-                        point = { x, z: y, y: depth };
-                    }
-                    break;
-                case 'x':
-                    if (x < this.height && y < this.depth) {
-                        point = { y: x, z: y, x: depth };
-                    }
-                    break;
+            const convert2Dtoto3D = {
+                z: { x, y, z: depth },
+                y: { x, z: y, y: depth },
+                x: { y: x, z: y, x: depth }
             }
-            if (point) points.push(point);  
+            point = convert2Dtoto3D[datasliceKey];
+            if (is2D) point = { x, y }
+
+            points.push(point)
         };
 
         if (brush === 1) {
@@ -135,15 +124,19 @@ export class ROIMaskRenderer {
 
     getIndexFromPoint(point) {
         const { x, y, z } = point;
+        let depth, height, width, dims;
+
         if (this.roi.shape.length === 2) {
-            if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-                return x + y * this.width;
+            [height, width] = this.roi.shape;
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+                return x + y * width;
             }
         } else {
-            if (x >= 0 && x < this.width && 
-                y >= 0 && y < this.height && 
-                z >= 0 && z < this.depth) {
-                return x + y * this.width + z * this.width * this.height;
+            [depth, height, width, ...dims] = this.roi.shape;
+            if (x >= 0 && x < width && 
+                y >= 0 && y < height && 
+                z >= 0 && z < depth) {
+                return x + y * width + z * width * height;
             }
         }
         return -1; // Return -1 if the point is out of bounds
