@@ -60,8 +60,6 @@ export class ROIMaskRenderer {
 
         const points = this.getPointsToDraw(pixel, depth);
         this.updateROIMask(points);
-
-        //this.render();
         return points;
     }
 

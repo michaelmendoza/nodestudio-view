@@ -70,8 +70,8 @@ class Viewer {
     }
 
     /** Renders dataset and ROI mask */
-    render = () => {
-        if (this.datasetRenderer) this.datasetRenderer.render();
+    render = async() => {
+        if (this.datasetRenderer) await this.datasetRenderer.render();
         if (this.roiMaskRenderer) this.roiMaskRenderer.render();
     }
 
