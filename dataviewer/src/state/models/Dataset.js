@@ -4,7 +4,7 @@ import APIDataService from "../../services/APIDataService";
 import Contrast from './Contrast';
 import ROIViewer from "./ROIViewer";
 
-export const VIEW_OPTIONS = ['2D View', '3D View']; //, 'Lightbox'];
+export const VIEW_OPTIONS = ['2D View', '3D View', 'Lightbox'];
 
 /** Get viewIndices for a given shape anddatasliceKey */
 export const getViewIndices = (shape, datasliceKey) => {

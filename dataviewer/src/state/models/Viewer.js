@@ -4,6 +4,7 @@ import { ROIMaskRenderer } from '../../libraries/Render/ROIRenderer';
 import { debounce } from '../../libraries/Utils';
 import { GridHelper } from '../../libraries/MeshFactory';
 import { DatasetRenderer } from '../../libraries/Render/DataRenderer';
+import { LightboxRenderer } from '../../libraries/Render/LightboxRenderer';
 
 const raycaster = new THREE.Raycaster();
 
@@ -26,7 +27,9 @@ class Viewer {
         this.roi_mesh_lightbox = {};
         this.grid_helper = null;
 
+        this.datasetRenderer = null;
         this.roiMaskRenderer = null;
+        this.lightboxRenderer = null;
 
         this.init();
 
@@ -66,6 +69,7 @@ class Viewer {
         this.dataset = dataset;
         this.datasetRenderer = new DatasetRenderer(this);
         this.roiMaskRenderer = new ROIMaskRenderer(this);
+        //this.lightboxRenderer = new LightboxRenderer(this);
         this.controls.reset();
     }
 

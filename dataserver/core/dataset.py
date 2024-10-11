@@ -129,6 +129,8 @@ class Dataset:
 class DatasetCache(CacheManager[Dataset]):
     """Cache manager specifically for Dataset objects."""
     
+    _cache: Dict[str, Dataset] = {}
+
     @classmethod
     def get(cls, key: str) -> Dataset:
         return super().get(key)
